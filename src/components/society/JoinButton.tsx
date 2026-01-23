@@ -59,6 +59,7 @@ export function JoinButton({ societyId, userId, membership }: JoinButtonProps) {
   const [error, setError] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmType, setConfirmType] = useState<"leave" | "cancel">("leave");
+  const [optimisticState, setOptimisticState] = useState<"pending" | "left" | null>(null);
   const router = useRouter();
 
   const handleJoin = async () => {
@@ -75,13 +76,15 @@ export function JoinButton({ societyId, userId, membership }: JoinButtonProps) {
       
       if (result.error) {
         setError(result.error);
+        setLoading(false);
       } else {
+        setOptimisticState("pending");
+        setLoading(false);
         router.refresh();
       }
     } catch (err) {
       console.error("Error joining society:", err);
       setError("Failed to join society");
-    } finally {
       setLoading(false);
     }
   };
@@ -98,13 +101,15 @@ export function JoinButton({ societyId, userId, membership }: JoinButtonProps) {
       
       if (result.error) {
         setError(result.error);
+        setLoading(false);
       } else {
+        setOptimisticState("left");
+        setLoading(false);
         router.refresh();
       }
     } catch (err) {
       console.error("Error leaving society:", err);
       setError("Failed to leave society");
-    } finally {
       setLoading(false);
     }
   };
@@ -123,6 +128,36 @@ export function JoinButton({ societyId, userId, membership }: JoinButtonProps) {
         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
         Loading...
       </button>
+    );
+  }
+
+  // Show optimistic "left" state - user just left/cancelled
+  if (optimisticState === "left" && membership) {
+    return (
+      <div className="flex flex-col gap-2">
+        <button
+          onClick={handleJoin}
+          className="inline-flex items-center gap-2 px-6 py-3 bg-accent-500 text-white font-semibold rounded-xl hover:bg-accent-600 transition-all btn-glow group"
+        >
+          <Sparkles className="h-4 w-4 group-hover:animate-pulse" />
+          Join the Circle
+        </button>
+        {error && <p className="text-red-400 text-sm">{error}</p>}
+      </div>
+    );
+  }
+
+  // Show optimistic "pending" state - user just joined
+  if (optimisticState === "pending" && !membership) {
+    return (
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center px-5 py-2.5 bg-yellow-500/20 text-yellow-400 rounded-xl border border-yellow-500/30">
+            <Clock className="h-4 w-4 mr-2" />
+            Pending Approval
+          </span>
+        </div>
+      </div>
     );
   }
 
