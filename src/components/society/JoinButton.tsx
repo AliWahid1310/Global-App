@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { joinSociety, leaveSociety } from "@/lib/actions/membership";
 import type { SocietyMember } from "@/types/database";
-import { Loader2, UserPlus, Check, Clock, X, Sparkles } from "lucide-react";
+import { Loader2, UserPlus, Check, Clock, X, Sparkles, AlertTriangle } from "lucide-react";
 
 interface JoinButtonProps {
   societyId: string;
@@ -12,9 +12,53 @@ interface JoinButtonProps {
   membership: SocietyMember | null;
 }
 
+interface ConfirmModalProps {
+  isOpen: boolean;
+  title: string;
+  message: string;
+  confirmText: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+function ConfirmModal({ isOpen, title, message, confirmText, onConfirm, onCancel }: ConfirmModalProps) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onCancel} />
+      <div className="relative glass-light rounded-2xl p-6 max-w-md mx-4 animate-scale-up">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center">
+            <AlertTriangle className="h-5 w-5 text-red-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-white">{title}</h3>
+        </div>
+        <p className="text-dark-200 mb-6">{message}</p>
+        <div className="flex gap-3 justify-end">
+          <button
+            onClick={onCancel}
+            className="px-4 py-2 text-dark-200 hover:text-white hover:bg-dark-700 rounded-lg transition-all"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 transition-all"
+          >
+            {confirmText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function JoinButton({ societyId, userId, membership }: JoinButtonProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmType, setConfirmType] = useState<"leave" | "cancel">("leave");
   const router = useRouter();
 
   const handleJoin = async () => {
@@ -47,6 +91,7 @@ export function JoinButton({ societyId, userId, membership }: JoinButtonProps) {
 
     setLoading(true);
     setError(null);
+    setShowConfirm(false);
     
     try {
       const result = await leaveSociety(societyId);
@@ -62,6 +107,11 @@ export function JoinButton({ societyId, userId, membership }: JoinButtonProps) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const openConfirmModal = (type: "leave" | "cancel") => {
+    setConfirmType(type);
+    setShowConfirm(true);
   };
 
   if (loading) {
@@ -100,7 +150,7 @@ export function JoinButton({ societyId, userId, membership }: JoinButtonProps) {
             Pending Approval
           </span>
           <button
-            onClick={handleLeave}
+            onClick={() => openConfirmModal("cancel")}
             className="p-2.5 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
             title="Cancel request"
           >
@@ -108,6 +158,14 @@ export function JoinButton({ societyId, userId, membership }: JoinButtonProps) {
           </button>
         </div>
         {error && <p className="text-red-400 text-sm">{error}</p>}
+        <ConfirmModal
+          isOpen={showConfirm}
+          title="Cancel Request?"
+          message="Are you sure you want to cancel your membership request? You can always request to join again later."
+          confirmText="Yes, Cancel Request"
+          onConfirm={handleLeave}
+          onCancel={() => setShowConfirm(false)}
+        />
       </div>
     );
   }
@@ -125,7 +183,7 @@ export function JoinButton({ societyId, userId, membership }: JoinButtonProps) {
           </span>
           {membership.role === "member" && (
             <button
-              onClick={handleLeave}
+              onClick={() => openConfirmModal("leave")}
               className="p-2.5 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
               title="Leave society"
             >
@@ -134,6 +192,14 @@ export function JoinButton({ societyId, userId, membership }: JoinButtonProps) {
           )}
         </div>
         {error && <p className="text-red-400 text-sm">{error}</p>}
+        <ConfirmModal
+          isOpen={showConfirm}
+          title="Leave Society?"
+          message="Are you sure you want to leave this society? You'll lose access to member-only content and chat."
+          confirmText="Yes, Leave Society"
+          onConfirm={handleLeave}
+          onCancel={() => setShowConfirm(false)}
+        />
       </div>
     );
   }
