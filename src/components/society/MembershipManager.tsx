@@ -29,10 +29,14 @@ export function MembershipManager({
   const [error, setError] = useState<string | null>(null);
   const [hiddenIds, setHiddenIds] = useState<string[]>([]);
   const [optimisticApproved, setOptimisticApproved] = useState<string[]>([]);
+  const [optimisticRoles, setOptimisticRoles] = useState<Record<string, "admin" | "moderator" | "member">>({});
   const router = useRouter();
 
   // Filter out hidden members for optimistic UI
-  const displayMembers = members.filter(m => !hiddenIds.includes(m.id));
+  const displayMembers = members.filter(m => !hiddenIds.includes(m.id)).map(m => ({
+    ...m,
+    role: optimisticRoles[m.id] || m.role
+  }));
 
   const handleApprove = async (memberId: string) => {
     setLoadingId(memberId);
@@ -117,15 +121,30 @@ export function MembershipManager({
   const handlePromote = async (memberId: string, newRole: "admin" | "moderator" | "member") => {
     setLoadingId(memberId);
     setError(null);
+    
+    // Optimistic update - show new role immediately
+    setOptimisticRoles(prev => ({ ...prev, [memberId]: newRole }));
+    
     try {
       const result = await updateMemberRole(societyId, memberId, newRole);
       if (result.error) {
+        // Revert on error
+        setOptimisticRoles(prev => {
+          const updated = { ...prev };
+          delete updated[memberId];
+          return updated;
+        });
         setError(result.error);
       } else {
         router.refresh();
       }
     } catch (err) {
       console.error("Error updating role:", err);
+      setOptimisticRoles(prev => {
+        const updated = { ...prev };
+        delete updated[memberId];
+        return updated;
+      });
       setError("Failed to update role");
     } finally {
       setLoadingId(null);
