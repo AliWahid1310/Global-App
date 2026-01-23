@@ -27,20 +27,35 @@ export function MembershipManager({
 }: MembershipManagerProps) {
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [hiddenIds, setHiddenIds] = useState<string[]>([]);
+  const [optimisticApproved, setOptimisticApproved] = useState<string[]>([]);
   const router = useRouter();
+
+  // Filter out hidden members for optimistic UI
+  const displayMembers = members.filter(m => !hiddenIds.includes(m.id));
 
   const handleApprove = async (memberId: string) => {
     setLoadingId(memberId);
     setError(null);
+    
+    // Optimistic update - hide from pending list immediately
+    setHiddenIds(prev => [...prev, memberId]);
+    setOptimisticApproved(prev => [...prev, memberId]);
+    
     try {
       const result = await approveMember(societyId, memberId);
       if (result.error) {
+        // Revert on error
+        setHiddenIds(prev => prev.filter(id => id !== memberId));
+        setOptimisticApproved(prev => prev.filter(id => id !== memberId));
         setError(result.error);
       } else {
         router.refresh();
       }
     } catch (err) {
       console.error("Error approving member:", err);
+      setHiddenIds(prev => prev.filter(id => id !== memberId));
+      setOptimisticApproved(prev => prev.filter(id => id !== memberId));
       setError("Failed to approve member");
     } finally {
       setLoadingId(null);
@@ -50,15 +65,22 @@ export function MembershipManager({
   const handleReject = async (memberId: string) => {
     setLoadingId(memberId);
     setError(null);
+    
+    // Optimistic update - hide immediately
+    setHiddenIds(prev => [...prev, memberId]);
+    
     try {
       const result = await rejectMember(societyId, memberId);
       if (result.error) {
+        // Revert on error
+        setHiddenIds(prev => prev.filter(id => id !== memberId));
         setError(result.error);
       } else {
         router.refresh();
       }
     } catch (err) {
       console.error("Error rejecting member:", err);
+      setHiddenIds(prev => prev.filter(id => id !== memberId));
       setError("Failed to reject member");
     } finally {
       setLoadingId(null);
@@ -70,15 +92,22 @@ export function MembershipManager({
 
     setLoadingId(memberId);
     setError(null);
+    
+    // Optimistic update - hide immediately
+    setHiddenIds(prev => [...prev, memberId]);
+    
     try {
       const result = await removeMember(societyId, memberId);
       if (result.error) {
+        // Revert on error
+        setHiddenIds(prev => prev.filter(id => id !== memberId));
         setError(result.error);
       } else {
         router.refresh();
       }
     } catch (err) {
       console.error("Error removing member:", err);
+      setHiddenIds(prev => prev.filter(id => id !== memberId));
       setError("Failed to remove member");
     } finally {
       setLoadingId(null);
@@ -103,7 +132,7 @@ export function MembershipManager({
     }
   };
 
-  if (members.length === 0) {
+  if (displayMembers.length === 0) {
     return (
       <p className="text-dark-400 text-sm text-center py-6">
         {type === "pending" ? "No pending requests" : "No members yet"}
@@ -113,7 +142,7 @@ export function MembershipManager({
 
   return (
     <div className="space-y-3">
-      {members.map((member) => (
+      {displayMembers.map((member) => (
         <div
           key={member.id}
           className={`flex items-center justify-between p-4 rounded-xl border ${
