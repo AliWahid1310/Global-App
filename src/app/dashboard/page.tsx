@@ -34,8 +34,8 @@ export default async function DashboardPage() {
 
   const memberships = (membershipsData || []) as MembershipWithSociety[];
   
-  // Get societies where user is an approved admin
-  const adminSocieties = memberships.filter((m) => m.role === "admin");
+  // Get societies where user is an admin or moderator (can manage)
+  const adminSocieties = memberships.filter((m) => m.role === "admin" || m.role === "moderator");
 
   // Get societies where user is just a member
   const memberSocieties = memberships.filter(
