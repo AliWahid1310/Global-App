@@ -28,8 +28,13 @@ export function PostManager({ societyId, posts }: PostManagerProps) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [optimisticPosts, setOptimisticPosts] = useState<(Post & { author: Profile | null })[]>([]);
+  const [deletedIds, setDeletedIds] = useState<string[]>([]);
   const router = useRouter();
   const supabase = createClient();
+
+  // Combine real posts with optimistic ones, excluding deleted
+  const displayPosts = [...optimisticPosts, ...posts.filter(p => !deletedIds.includes(p.id))];
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,15 +62,38 @@ export function PostManager({ societyId, posts }: PostManagerProps) {
         image_url: imageUrl,
       };
 
-      const { error } = await (supabase.from("posts") as any).insert(postData);
+      // Create optimistic post
+      const optimisticPost: Post & { author: Profile | null } = {
+        id: `temp-${Date.now()}`,
+        society_id: societyId,
+        author_id: user.id,
+        title,
+        content,
+        image_url: imageUrl,
+        is_pinned: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        author: { id: user.id, email: user.email || '', full_name: user.user_metadata?.full_name || 'You', avatar_url: null, university: null, is_admin: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }
+      };
 
-      if (error) throw error;
-
+      // Show optimistic update immediately
+      setOptimisticPosts(prev => [optimisticPost, ...prev]);
       setTitle("");
       setContent("");
       setImageFile(null);
       setShowForm(false);
+
+      const { error } = await (supabase.from("posts") as any).insert(postData);
+
+      if (error) {
+        // Revert optimistic update on error
+        setOptimisticPosts(prev => prev.filter(p => p.id !== optimisticPost.id));
+        throw error;
+      }
+
+      // Clear optimistic posts after refresh brings real data
       router.refresh();
+      setTimeout(() => setOptimisticPosts([]), 1000);
     } catch (error) {
       console.error("Error creating post:", error);
     } finally {
@@ -76,16 +104,20 @@ export function PostManager({ societyId, posts }: PostManagerProps) {
   const handleDelete = async (postId: string) => {
     if (!confirm("Are you sure you want to delete this post?")) return;
 
-    setLoadingId(postId);
+    // Optimistic delete - hide immediately
+    setDeletedIds(prev => [...prev, postId]);
+    
     try {
       const { error } = await supabase.from("posts").delete().eq("id", postId);
 
-      if (error) throw error;
+      if (error) {
+        // Revert on error
+        setDeletedIds(prev => prev.filter(id => id !== postId));
+        throw error;
+      }
       router.refresh();
     } catch (error) {
       console.error("Error deleting post:", error);
-    } finally {
-      setLoadingId(null);
     }
   };
 
@@ -200,12 +232,12 @@ export function PostManager({ societyId, posts }: PostManagerProps) {
 
       {/* Posts List */}
       <div className="mt-4 space-y-3">
-        {posts.length === 0 ? (
+        {displayPosts.length === 0 ? (
           <p className="text-dark-400 text-sm text-center py-6">
             No posts yet. Create your first announcement!
           </p>
         ) : (
-          posts.map((post) => (
+          displayPosts.map((post) => (
             <div
               key={post.id}
               className="flex items-start justify-between p-4 bg-dark-800/50 border border-dark-700 rounded-xl"

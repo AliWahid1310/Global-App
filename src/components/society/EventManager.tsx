@@ -24,8 +24,13 @@ export function EventManager({ societyId, events }: EventManagerProps) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [optimisticEvents, setOptimisticEvents] = useState<Event[]>([]);
+  const [deletedIds, setDeletedIds] = useState<string[]>([]);
   const router = useRouter();
   const supabase = createClient();
+
+  // Combine real events with optimistic ones, excluding deleted
+  const displayEvents = [...optimisticEvents, ...events.filter(e => !deletedIds.includes(e.id))];
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,10 +62,24 @@ export function EventManager({ societyId, events }: EventManagerProps) {
         is_public: true,
       };
 
-      const { error } = await (supabase.from("events") as any).insert(eventData);
+      // Create optimistic event
+      const optimisticEvent: Event = {
+        id: `temp-${Date.now()}`,
+        society_id: societyId,
+        created_by: user.id,
+        title,
+        description,
+        location,
+        start_time: new Date(startTime).toISOString(),
+        end_time: endTime ? new Date(endTime).toISOString() : null,
+        image_url: imageUrl,
+        is_public: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
 
-      if (error) throw error;
-
+      // Show optimistic update immediately
+      setOptimisticEvents(prev => [optimisticEvent, ...prev]);
       setTitle("");
       setDescription("");
       setLocation("");
@@ -68,7 +87,18 @@ export function EventManager({ societyId, events }: EventManagerProps) {
       setEndTime("");
       setImageFile(null);
       setShowForm(false);
+
+      const { error } = await (supabase.from("events") as any).insert(eventData);
+
+      if (error) {
+        // Revert optimistic update on error
+        setOptimisticEvents(prev => prev.filter(e => e.id !== optimisticEvent.id));
+        throw error;
+      }
+
+      // Clear optimistic events after refresh brings real data
       router.refresh();
+      setTimeout(() => setOptimisticEvents([]), 1000);
     } catch (error) {
       console.error("Error creating event:", error);
     } finally {
@@ -79,27 +109,31 @@ export function EventManager({ societyId, events }: EventManagerProps) {
   const handleDelete = async (eventId: string) => {
     if (!confirm("Are you sure you want to delete this event?")) return;
 
-    setLoadingId(eventId);
+    // Optimistic delete - hide immediately
+    setDeletedIds(prev => [...prev, eventId]);
+    
     try {
       const { error } = await supabase
         .from("events")
         .delete()
         .eq("id", eventId);
 
-      if (error) throw error;
+      if (error) {
+        // Revert on error
+        setDeletedIds(prev => prev.filter(id => id !== eventId));
+        throw error;
+      }
       router.refresh();
     } catch (error) {
       console.error("Error deleting event:", error);
-    } finally {
-      setLoadingId(null);
     }
   };
 
   const now = new Date();
-  const upcomingEvents = events.filter(
+  const upcomingEvents = displayEvents.filter(
     (e) => new Date(e.start_time) >= now
   );
-  const pastEvents = events.filter((e) => new Date(e.start_time) < now);
+  const pastEvents = displayEvents.filter((e) => new Date(e.start_time) < now);
 
   return (
     <div>
@@ -300,7 +334,7 @@ export function EventManager({ societyId, events }: EventManagerProps) {
           </div>
         )}
 
-        {events.length === 0 && !showForm && (
+        {displayEvents.length === 0 && !showForm && (
           <p className="text-dark-400 text-sm text-center py-6">
             No events yet. Create your first one!
           </p>
