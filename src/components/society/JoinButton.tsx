@@ -26,8 +26,8 @@ function ConfirmModal({ isOpen, title, message, confirmText, onConfirm, onCancel
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onCancel} />
-      <div className="relative glass-light rounded-2xl p-6 max-w-md mx-4 animate-scale-up">
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onCancel} />
+      <div className="relative bg-dark-900 border border-dark-600 rounded-2xl p-6 max-w-md mx-4 animate-scale-up shadow-2xl">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center">
             <AlertTriangle className="h-5 w-5 text-red-400" />
