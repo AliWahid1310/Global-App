@@ -8,11 +8,20 @@ export function LoadingBar() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // Reset when route changes complete
-    setLoading(false);
-    setProgress(0);
+    // Route change completed - finish the bar
+    if (loading) {
+      setProgress(100);
+      setTimeout(() => {
+        setVisible(false);
+        setTimeout(() => {
+          setLoading(false);
+          setProgress(0);
+        }, 200);
+      }, 200);
+    }
   }, [pathname, searchParams]);
 
   useEffect(() => {
@@ -20,26 +29,24 @@ export function LoadingBar() {
 
     const handleStart = () => {
       setLoading(true);
-      setProgress(20);
+      setVisible(true);
+      setProgress(0);
       
-      // Gradually increase progress
+      // Quick initial jump
+      setTimeout(() => setProgress(30), 50);
+      
+      // Gradually increase progress, slowing down as it gets higher
       progressInterval = setInterval(() => {
         setProgress(prev => {
           if (prev >= 90) {
             clearInterval(progressInterval);
             return 90;
           }
-          return prev + 10;
+          // Slow down as we progress
+          const increment = prev < 50 ? 10 : prev < 70 ? 5 : 2;
+          return Math.min(prev + increment, 90);
         });
-      }, 200);
-    };
-
-    const handleComplete = () => {
-      setProgress(100);
-      setTimeout(() => {
-        setLoading(false);
-        setProgress(0);
-      }, 200);
+      }, 300);
     };
 
     // Listen for link clicks to show loading
@@ -47,10 +54,14 @@ export function LoadingBar() {
       const target = e.target as HTMLElement;
       const link = target.closest('a');
       
-      if (link && link.href && !link.href.startsWith('javascript:') && !link.target) {
-        const url = new URL(link.href);
-        if (url.origin === window.location.origin && url.pathname !== pathname) {
-          handleStart();
+      if (link && link.href && !link.href.startsWith('javascript:') && !link.href.startsWith('#') && !link.target && !link.download) {
+        try {
+          const url = new URL(link.href);
+          if (url.origin === window.location.origin && url.pathname !== pathname) {
+            handleStart();
+          }
+        } catch {
+          // Invalid URL, ignore
         }
       }
     };
@@ -63,19 +74,15 @@ export function LoadingBar() {
     };
   }, [pathname]);
 
-  if (!loading && progress === 0) return null;
+  if (!visible) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[100] h-1">
+    <div className="fixed top-0 left-0 right-0 z-[100] h-[3px] bg-dark-800/50">
       <div
-        className="h-full bg-gradient-to-r from-accent-400 to-accent-600 transition-all duration-300 ease-out"
-        style={{ width: `${progress}%` }}
-      />
-      <div 
-        className="absolute right-0 top-0 h-full w-24 bg-gradient-to-r from-transparent to-accent-400/50 blur-sm"
+        className="h-full bg-gradient-to-r from-accent-500 via-accent-400 to-accent-500 shadow-[0_0_10px_rgba(139,92,246,0.7)] transition-all ease-out"
         style={{ 
-          opacity: loading ? 1 : 0,
-          transform: `translateX(${loading ? '0' : '100%'})` 
+          width: `${progress}%`,
+          transitionDuration: progress === 100 ? '200ms' : '400ms'
         }}
       />
     </div>
