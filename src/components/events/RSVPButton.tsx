@@ -13,6 +13,7 @@ import {
   ChevronDown,
   Calendar,
   Clock,
+  AlertCircle,
 } from "lucide-react";
 
 interface RSVPButtonProps {
@@ -38,6 +39,7 @@ export function RSVPButton({
   const [showGuestModal, setShowGuestModal] = useState(false);
   const [guestCount, setGuestCount] = useState(userRSVP?.guest_count || 0);
   const [pendingStatus, setPendingStatus] = useState<RSVPStatus | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const isAtCapacity =
@@ -64,15 +66,19 @@ export function RSVPButton({
     setLoading(true);
     setShowOptions(false);
     setShowGuestModal(false);
+    setError(null);
 
     try {
       const result = await rsvpToEvent(event.id, status, guestCount);
       if (result.error) {
-        console.error(result.error);
+        setError(result.error);
+        console.error("RSVP error:", result.error);
+      } else {
+        router.refresh();
       }
-      router.refresh();
-    } catch (error) {
-      console.error("RSVP failed:", error);
+    } catch (err) {
+      setError("Failed to RSVP. Please try again.");
+      console.error("RSVP failed:", err);
     } finally {
       setLoading(false);
       setPendingStatus(null);
@@ -81,11 +87,17 @@ export function RSVPButton({
 
   const handleCancel = async () => {
     setLoading(true);
+    setError(null);
     try {
-      await cancelRSVP(event.id);
-      router.refresh();
-    } catch (error) {
-      console.error("Cancel RSVP failed:", error);
+      const result = await cancelRSVP(event.id);
+      if (result.error) {
+        setError(result.error);
+      } else {
+        router.refresh();
+      }
+    } catch (err) {
+      setError("Failed to cancel RSVP. Please try again.");
+      console.error("Cancel RSVP failed:", err);
     } finally {
       setLoading(false);
     }
@@ -191,6 +203,14 @@ export function RSVPButton({
             </div>
           </>
         )}
+
+        {/* Error display */}
+        {error && (
+          <div className="mt-3 flex items-center gap-2 px-3 py-2 bg-red-500/20 border border-red-500/30 rounded-xl text-red-400 text-sm">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            {error}
+          </div>
+        )}
       </div>
     );
   }
@@ -218,6 +238,14 @@ export function RSVPButton({
           <ChevronDown className="w-4 h-4 text-dark-300" />
         </button>
       </div>
+
+      {/* Error display */}
+      {error && (
+        <div className="mt-3 flex items-center gap-2 px-3 py-2 bg-red-500/20 border border-red-500/30 rounded-xl text-red-400 text-sm">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          {error}
+        </div>
+      )}
 
       {/* Options dropdown */}
       {showOptions && (

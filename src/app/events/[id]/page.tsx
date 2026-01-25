@@ -5,7 +5,6 @@ import { createClient } from "@/lib/supabase/server";
 import { isSocietyModerator } from "@/lib/auth/roles";
 import { RSVPButton } from "@/components/events/RSVPButton";
 import { AttendeesList, AttendeesPreview } from "@/components/events/AttendeesList";
-import { EventTicket } from "@/components/events/QRCode";
 import { format } from "date-fns";
 import {
   Calendar,
@@ -15,7 +14,6 @@ import {
   ArrowLeft,
   Share2,
   Settings,
-  QrCode,
   Bell,
   CheckCircle,
   AlertCircle,
@@ -141,20 +139,13 @@ export default async function EventPage({ params }: Props) {
 
         {/* Admin actions */}
         {canManage && (
-          <div className="absolute top-6 right-6 z-10 flex gap-2">
+          <div className="absolute top-6 right-6 z-10">
             <Link
               href={`/events/${id}/manage`}
               className="flex items-center gap-2 px-4 py-2 glass rounded-xl text-white hover:bg-white/10 transition-colors"
             >
               <Settings className="w-4 h-4" />
               Manage
-            </Link>
-            <Link
-              href={`/events/${id}/checkin`}
-              className="flex items-center gap-2 px-4 py-2 bg-accent-500 hover:bg-accent-600 rounded-xl text-white transition-colors"
-            >
-              <QrCode className="w-4 h-4" />
-              Check-in
             </Link>
           </div>
         )}
@@ -336,19 +327,6 @@ export default async function EventPage({ params }: Props) {
                 rsvpCount={counts}
                 isLoggedIn={!!user}
               />
-
-              {/* Show ticket if going */}
-              {userRSVP?.status === "going" && event.event_code && (
-                <div className="mt-6 pt-6 border-t border-dark-700">
-                  <Link
-                    href={`/events/${id}/ticket`}
-                    className="flex items-center justify-center gap-2 w-full py-3 bg-dark-700 hover:bg-dark-600 rounded-xl text-white transition-colors"
-                  >
-                    <QrCode className="w-4 h-4" />
-                    View My Ticket
-                  </Link>
-                </div>
-              )}
 
               {/* Share */}
               <div className="mt-4 pt-4 border-t border-dark-700">

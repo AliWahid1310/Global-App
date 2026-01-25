@@ -10,7 +10,6 @@ import {
   ArrowLeft,
   Calendar,
   Users,
-  QrCode,
   CheckCircle,
   Clock,
   Download,
@@ -121,15 +120,7 @@ export default async function EventManagePage({ params }: Props) {
               </p>
             </div>
 
-            <div className="flex gap-3">
-              <Link
-                href={`/events/${id}/checkin`}
-                className="flex items-center gap-2 px-5 py-3 bg-accent-500 hover:bg-accent-600 text-white rounded-xl transition-colors font-medium"
-              >
-                <QrCode className="w-5 h-5" />
-                QR Check-in
-              </Link>
-            </div>
+
           </div>
         </div>
 
