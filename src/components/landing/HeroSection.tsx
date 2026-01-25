@@ -92,42 +92,61 @@ export function HeroSection() {
         </div>
       </section>
 
-      {/* Tagline Section - Below the fold */}
-      <section className="relative py-20 bg-dark-950 overflow-hidden">
+      {/* Trusted By Section - Universities */}
+      <section className="relative py-16 bg-dark-950 overflow-hidden">
         {/* Top gradient blend */}
         <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-dark-950 to-transparent" />
         
-        {/* Ambient glow effects */}
-        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-accent-500/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl" />
-        
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          {/* Main tagline */}
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold mb-6">
-            <span className="text-white">Where </span>
-            <span className="gradient-text">communities</span>
-            <span className="text-white"> come alive</span>
-          </h2>
+        <div className="relative z-10 max-w-5xl mx-auto px-6">
+          <p className="text-center text-dark-400 text-sm uppercase tracking-widest mb-8 font-medium">
+            Empowering students across universities
+          </p>
           
-          {/* Feature pills */}
-          <div className="flex flex-wrap justify-center gap-3 mt-10">
-            {[
-              { icon: "🎯", text: "Discover societies" },
-              { icon: "🎪", text: "Join exciting events" },
-              { icon: "💬", text: "Connect with peers" },
-              { icon: "✨", text: "Build your network" },
-            ].map((item, i) => (
-              <div 
-                key={i}
-                className="flex items-center gap-2 px-5 py-2.5 glass rounded-full hover:bg-white/10 transition-all cursor-default group"
-                style={{ animationDelay: `${i * 0.1}s` }}
-              >
-                <span className="text-lg group-hover:scale-110 transition-transform">{item.icon}</span>
-                <span className="text-sm text-dark-200 group-hover:text-white transition-colors font-medium">{item.text}</span>
-              </div>
-            ))}
+          {/* University logos/names with animated scroll effect */}
+          <div className="relative overflow-hidden">
+            <div className="flex animate-scroll gap-12 items-center">
+              {[
+                "Air University",
+                "NUST",
+                "FAST",
+                "COMSATS",
+                "LUMS",
+                "IBA",
+                "GIKI",
+                "PIEAS",
+                "Air University",
+                "NUST",
+                "FAST",
+                "COMSATS",
+              ].map((uni, i) => (
+                <span 
+                  key={i} 
+                  className="text-dark-300 text-lg font-semibold whitespace-nowrap hover:text-accent-400 transition-colors cursor-default"
+                >
+                  {uni}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
+        
+        {/* Add CSS for scroll animation */}
+        <style jsx>{`
+          @keyframes scroll {
+            0% {
+              transform: translateX(0);
+            }
+            100% {
+              transform: translateX(-50%);
+            }
+          }
+          .animate-scroll {
+            animation: scroll 20s linear infinite;
+          }
+          .animate-scroll:hover {
+            animation-play-state: paused;
+          }
+        `}</style>
       </section>
     </>
   );
