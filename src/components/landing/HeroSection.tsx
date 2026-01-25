@@ -93,39 +93,72 @@ export function HeroSection() {
       </section>
 
       {/* Trusted By Section - Universities */}
-      <section className="relative py-16 bg-dark-950 overflow-hidden">
-        {/* Top gradient blend */}
-        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-dark-950 to-transparent" />
+      <section className="relative py-24 mt-12 bg-dark-950 overflow-hidden">
+        {/* Ambient glow effects */}
+        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-96 h-96 bg-accent-500/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 right-0 -translate-y-1/2 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
         
-        <div className="relative z-10 max-w-5xl mx-auto px-6">
-          <p className="text-center text-dark-400 text-sm uppercase tracking-widest mb-8 font-medium">
-            Empowering students across universities
-          </p>
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
+          {/* Header with animation */}
+          <div 
+            className={`text-center mb-12 transition-all duration-700 ${
+              mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+            style={{ transitionDelay: "400ms" }}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-4">
+              <span className="w-2 h-2 rounded-full bg-accent-400 animate-pulse" />
+              <span className="text-xs text-accent-300 font-medium uppercase tracking-wider">Trusted Platform</span>
+            </div>
+            <p className="text-dark-300 text-lg">
+              Empowering students across <span className="text-white font-semibold">top universities</span>
+            </p>
+          </div>
           
-          {/* University logos/names with animated scroll effect */}
-          <div className="relative overflow-hidden">
-            <div className="flex animate-scroll gap-12 items-center">
-              {[
-                "Air University",
-                "NUST",
-                "FAST",
-                "COMSATS",
-                "LUMS",
-                "IBA",
-                "GIKI",
-                "PIEAS",
-                "Air University",
-                "NUST",
-                "FAST",
-                "COMSATS",
-              ].map((uni, i) => (
-                <span 
-                  key={i} 
-                  className="text-dark-300 text-lg font-semibold whitespace-nowrap hover:text-accent-400 transition-colors cursor-default"
-                >
-                  {uni}
-                </span>
-              ))}
+          {/* University marquee with glass effect */}
+          <div 
+            className={`relative transition-all duration-700 ${
+              mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+            style={{ transitionDelay: "500ms" }}
+          >
+            {/* Fade edges */}
+            <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-dark-950 to-transparent z-10" />
+            <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-dark-950 to-transparent z-10" />
+            
+            <div className="glass rounded-2xl py-6 px-4 overflow-hidden">
+              <div className="flex animate-scroll gap-16 items-center">
+                {[
+                  "Air University",
+                  "NUST",
+                  "FAST-NUCES",
+                  "COMSATS",
+                  "LUMS",
+                  "IBA Karachi",
+                  "GIKI",
+                  "PIEAS",
+                  "UET Lahore",
+                  "SZABIST",
+                  "Air University",
+                  "NUST",
+                  "FAST-NUCES",
+                  "COMSATS",
+                  "LUMS",
+                  "IBA Karachi",
+                ].map((uni, i) => (
+                  <div 
+                    key={i} 
+                    className="flex items-center gap-3 whitespace-nowrap group cursor-default"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-dark-700/50 flex items-center justify-center group-hover:bg-accent-500/20 transition-colors">
+                      <span className="text-xl">🎓</span>
+                    </div>
+                    <span className="text-dark-200 text-base font-semibold group-hover:text-accent-400 transition-colors">
+                      {uni}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -141,7 +174,7 @@ export function HeroSection() {
             }
           }
           .animate-scroll {
-            animation: scroll 20s linear infinite;
+            animation: scroll 30s linear infinite;
           }
           .animate-scroll:hover {
             animation-play-state: paused;
