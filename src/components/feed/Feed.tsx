@@ -167,7 +167,7 @@ export function Feed({ initialItems, initialHasMore }: FeedProps) {
 // ========== EVENT HORIZONTAL CARD (Netflix Style) ==========
 function EventHorizontalCard({ item }: { item: EventFeedItem }) {
   const [rsvpStatus, setRsvpStatus] = useState(item.user_rsvp_status);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<"going" | "maybe" | null>(null);
   const [rsvpCount, setRsvpCount] = useState(item.rsvp_count);
 
   const eventDate = new Date(item.start_time);
@@ -175,32 +175,50 @@ function EventHorizontalCard({ item }: { item: EventFeedItem }) {
   const isTomorrow = eventDate.toDateString() === new Date(Date.now() + 86400000).toDateString();
 
   const handleRSVP = async (status: RSVPStatus) => {
-    setLoading(true);
+    if (loading) return;
+    
+    // Optimistic update - update UI immediately
+    const previousStatus = rsvpStatus;
+    const previousCount = { ...rsvpCount };
+    
+    setLoading(status as "going" | "maybe");
+    
+    // Optimistically update the UI
+    if (rsvpStatus === status) {
+      setRsvpStatus(null);
+      setRsvpCount((prev) => ({
+        ...prev,
+        going: status === "going" ? prev.going - 1 : prev.going,
+        maybe: status === "maybe" ? prev.maybe - 1 : prev.maybe,
+      }));
+    } else {
+      const newCount = { ...rsvpCount };
+      if (rsvpStatus === "going") newCount.going -= 1;
+      if (rsvpStatus === "maybe") newCount.maybe -= 1;
+      if (status === "going") newCount.going += 1;
+      if (status === "maybe") newCount.maybe += 1;
+      setRsvpCount(newCount);
+      setRsvpStatus(status);
+    }
+
     try {
-      if (rsvpStatus === status) {
+      if (previousStatus === status) {
         await cancelRSVP(item.id);
-        setRsvpStatus(null);
-        setRsvpCount((prev: typeof rsvpCount) => ({
-          ...prev,
-          going: status === "going" ? prev.going - 1 : prev.going,
-          maybe: status === "maybe" ? prev.maybe - 1 : prev.maybe,
-        }));
       } else {
         const result = await rsvpToEvent(item.id, status, 0);
-        if (!result.error) {
-          const newCount = { ...rsvpCount };
-          if (rsvpStatus === "going") newCount.going -= 1;
-          if (rsvpStatus === "maybe") newCount.maybe -= 1;
-          if (status === "going") newCount.going += 1;
-          if (status === "maybe") newCount.maybe += 1;
-          setRsvpCount(newCount);
-          setRsvpStatus(status);
+        if (result.error) {
+          // Revert on error
+          setRsvpStatus(previousStatus);
+          setRsvpCount(previousCount);
         }
       }
     } catch (error) {
+      // Revert on error
+      setRsvpStatus(previousStatus);
+      setRsvpCount(previousCount);
       console.error("RSVP error:", error);
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   };
 
@@ -280,25 +298,37 @@ function EventHorizontalCard({ item }: { item: EventFeedItem }) {
         <div className="flex gap-2 pt-1">
           <button
             onClick={() => handleRSVP("going")}
-            disabled={loading}
-            className={`flex-1 py-2 px-3 text-xs font-semibold rounded-xl transition-all duration-200 ${
+            disabled={loading !== null}
+            className={`flex-1 py-2 px-3 text-xs font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 ${
               rsvpStatus === "going"
                 ? "bg-green-500 text-white shadow-lg shadow-green-500/25"
                 : "bg-dark-800 text-dark-300 hover:bg-green-500/20 hover:text-green-400"
             }`}
           >
-            {rsvpStatus === "going" ? "✓ Going" : "Going"}
+            {loading === "going" ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : rsvpStatus === "going" ? (
+              "✓ Going"
+            ) : (
+              "Going"
+            )}
           </button>
           <button
             onClick={() => handleRSVP("maybe")}
-            disabled={loading}
-            className={`flex-1 py-2 px-3 text-xs font-semibold rounded-xl transition-all duration-200 ${
+            disabled={loading !== null}
+            className={`flex-1 py-2 px-3 text-xs font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 ${
               rsvpStatus === "maybe"
                 ? "bg-amber-500 text-white shadow-lg shadow-amber-500/25"
                 : "bg-dark-800 text-dark-300 hover:bg-amber-500/20 hover:text-amber-400"
             }`}
           >
-            {rsvpStatus === "maybe" ? "✓ Maybe" : "Maybe"}
+            {loading === "maybe" ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : rsvpStatus === "maybe" ? (
+              "✓ Maybe"
+            ) : (
+              "Maybe"
+            )}
           </button>
         </div>
       </div>
