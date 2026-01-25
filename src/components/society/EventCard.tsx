@@ -92,7 +92,7 @@ export function EventCard({ event, rsvpCount, userRSVPStatus }: EventCardProps) 
               <div className="flex items-center gap-1.5 text-sm">
                 <Users className="w-4 h-4 text-accent-400" />
                 <span className="text-white font-medium">{rsvpCount.going}</span>
-                <span className="text-dark-400">going</span>
+                <span className="text-green-400 font-semibold">going</span>
                 {rsvpCount.maybe > 0 && (
                   <span className="text-dark-500">• {rsvpCount.maybe} maybe</span>
                 )}
