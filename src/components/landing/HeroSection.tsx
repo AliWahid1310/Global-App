@@ -92,59 +92,64 @@ export function HeroSection() {
         </div>
       </section>
 
-      {/* Trusted By Section - Universities */}
-      <section className="relative py-16 bg-dark-950 overflow-hidden">
-        {/* Top gradient blend */}
-        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-dark-950 to-transparent" />
+      {/* Animated Divider Section */}
+      <section className="relative py-24 bg-dark-950 overflow-hidden">
+        {/* Animated floating orbs */}
+        <div className="absolute inset-0">
+          <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-72 h-72 bg-accent-500/20 rounded-full blur-3xl animate-float" />
+          <div className="absolute top-1/3 right-1/3 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl animate-float-delayed" />
+          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-pink-500/10 rounded-full blur-3xl animate-float-slow" />
+        </div>
         
-        <div className="relative z-10 max-w-5xl mx-auto px-6">
-          <p className="text-center text-dark-400 text-sm uppercase tracking-widest mb-8 font-medium">
-            Empowering students across universities
-          </p>
+        {/* Animated gradient line */}
+        <div className="relative z-10 max-w-4xl mx-auto px-6">
+          <div className="relative h-px w-full overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-accent-500 to-transparent animate-shimmer" />
+          </div>
           
-          {/* University logos/names with animated scroll effect */}
-          <div className="relative overflow-hidden">
-            <div className="flex animate-scroll gap-12 items-center">
-              {[
-                "Air University",
-                "NUST",
-                "FAST",
-                "COMSATS",
-                "LUMS",
-                "IBA",
-                "GIKI",
-                "PIEAS",
-                "Air University",
-                "NUST",
-                "FAST",
-                "COMSATS",
-              ].map((uni, i) => (
-                <span 
-                  key={i} 
-                  className="text-dark-300 text-lg font-semibold whitespace-nowrap hover:text-accent-400 transition-colors cursor-default"
-                >
-                  {uni}
-                </span>
-              ))}
+          {/* Center icon */}
+          <div className="flex justify-center -mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 bg-accent-500/30 rounded-full blur-xl animate-pulse" />
+              <div className="relative w-12 h-12 glass rounded-full flex items-center justify-center border border-accent-500/30">
+                <Sparkles className="w-5 h-5 text-accent-400 animate-pulse" />
+              </div>
             </div>
           </div>
         </div>
         
-        {/* Add CSS for scroll animation */}
+        {/* CSS Animations */}
         <style jsx>{`
-          @keyframes scroll {
-            0% {
-              transform: translateX(0);
-            }
-            100% {
-              transform: translateX(-50%);
-            }
+          @keyframes float {
+            0%, 100% { transform: translateY(-50%) translateX(0); }
+            50% { transform: translateY(-50%) translateX(20px); }
           }
-          .animate-scroll {
-            animation: scroll 20s linear infinite;
+          @keyframes float-delayed {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.05); }
           }
-          .animate-scroll:hover {
-            animation-play-state: paused;
+          @keyframes float-slow {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(20px) translateX(-20px); }
+          }
+          @keyframes shimmer {
+            0% { transform: translateX(-100%); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(100%); opacity: 0; }
+          }
+          .animate-float {
+            animation: float 8s ease-in-out infinite;
+          }
+          .animate-float-delayed {
+            animation: float-delayed 10s ease-in-out infinite;
+            animation-delay: -3s;
+          }
+          .animate-float-slow {
+            animation: float-slow 12s ease-in-out infinite;
+            animation-delay: -5s;
+          }
+          .animate-shimmer {
+            animation: shimmer 3s ease-in-out infinite;
           }
         `}</style>
       </section>
