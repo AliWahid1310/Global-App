@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { isPlatformAdmin } from "@/lib/auth/roles";
 
 /**
- * Join a society - auto-approved for public societies, pending for private ones
+ * Join a society - platform admins get auto-approved, others are pending
  */
 export async function joinSociety(societyId: string) {
   const supabase = await createClient();
@@ -28,25 +28,16 @@ export async function joinSociety(societyId: string) {
     const status = (existing as any).status;
     return { error: `Already ${status}` };
   }
-
-  // Check if society is public
-  const { data: society } = await supabase
-    .from("societies")
-    .select("is_public")
-    .eq("id", societyId)
-    .single();
-
-  const isPublic = (society as any)?.is_public ?? true;
   
-  // Check if user is platform admin - they get auto-approved as admin
+  // Check if user is platform admin - they get auto-approved
   const isAdmin = await isPlatformAdmin(user.id);
   
-  // Auto-approve for public societies or platform admins, pending for private societies
+  // Platform admins get auto-approved, others are pending
   const { error } = await (supabase.from("society_members") as any).insert({
     society_id: societyId,
     user_id: user.id,
     role: isAdmin ? "admin" : "member",
-    status: (isPublic || isAdmin) ? "approved" : "pending",
+    status: isAdmin ? "approved" : "pending",
   });
   
   if (error) {
@@ -54,7 +45,6 @@ export async function joinSociety(societyId: string) {
   }
   
   revalidatePath(`/societies`);
-  revalidatePath(`/feed`);
   return { success: true };
 }
 
