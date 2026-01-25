@@ -267,15 +267,21 @@ export default async function EventPage({ params }: Props) {
               <h3 className="text-lg font-semibold text-white mb-4">Join this event</h3>
 
               {/* Stats */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-dark-800 rounded-xl p-4 text-center">
+              <div className="flex items-center gap-6 mb-6 pb-6 border-b border-dark-700">
+                <div className="text-center">
                   <p className="text-2xl font-bold text-white">{counts.going}</p>
-                  <p className="text-sm text-dark-400">Going</p>
+                  <p className="text-xs text-dark-400">going</p>
                 </div>
-                <div className="bg-dark-800 rounded-xl p-4 text-center">
+                <div className="text-center">
                   <p className="text-2xl font-bold text-white">{counts.maybe}</p>
-                  <p className="text-sm text-dark-400">Maybe</p>
+                  <p className="text-xs text-dark-400">maybe</p>
                 </div>
+                {counts.waitlist > 0 && (
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-white">{counts.waitlist}</p>
+                    <p className="text-xs text-dark-400">waitlist</p>
+                  </div>
+                )}
               </div>
 
               {/* Capacity indicator */}
