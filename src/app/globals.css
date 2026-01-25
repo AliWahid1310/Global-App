@@ -47,6 +47,15 @@ body {
   overflow-x: hidden;
 }
 
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Noise texture overlay */
 .noise-overlay {
   position: fixed;
