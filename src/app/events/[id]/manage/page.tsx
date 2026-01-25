@@ -1,23 +1,17 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { isSocietyModerator } from "@/lib/auth/roles";
 import { AttendeesList } from "@/components/events/AttendeesList";
-import { CheckInActions } from "@/app/events/[id]/manage/CheckInActions";
 import { format } from "date-fns";
 import {
   ArrowLeft,
-  Calendar,
   Users,
   CheckCircle,
   Clock,
   Download,
-  Settings,
-  MapPin,
-  BarChart3,
 } from "lucide-react";
-import type { Event, Society, RSVPWithUser, CheckinWithUser } from "@/types/database";
+import type { Event, Society, RSVPWithUser } from "@/types/database";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -67,39 +61,23 @@ export default async function EventManagePage({ params }: Props) {
   const rsvpCounts = rsvpCountsData as { going: number; maybe: number; waitlist: number; total_guests: number } | null;
   const counts = rsvpCounts || { going: 0, maybe: 0, waitlist: 0, total_guests: 0 };
 
-  // Fetch all RSVPs with user info and checkin status
+  // Fetch all RSVPs with user info
   const { data: rsvpsData } = await supabase
     .from("event_rsvps")
     .select(`
       *,
-      user:profiles(*),
-      checkin:event_checkins(*)
+      user:profiles(*)
     `)
     .eq("event_id", id)
     .order("created_at", { ascending: true });
 
   const rsvps = (rsvpsData || []) as RSVPWithUser[];
 
-  // Get check-in stats
-  const { data: checkinsData } = await supabase
-    .from("event_checkins")
-    .select(`
-      *,
-      user:profiles(*)
-    `)
-    .eq("event_id", id)
-    .order("checked_in_at", { ascending: false });
-
-  const checkins = (checkinsData || []) as CheckinWithUser[];
-  const totalCheckedIn = checkins.length;
-  const checkinRate = counts.going > 0 ? Math.round((totalCheckedIn / counts.going) * 100) : 0;
-
   const eventDate = new Date(event.start_time);
-  const isPast = eventDate < new Date();
 
   return (
     <div className="bg-dark-950 min-h-screen pt-24 pb-12">
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-4xl mx-auto px-6">
         {/* Header */}
         <div className="mb-8">
           <Link
@@ -110,22 +88,16 @@ export default async function EventManagePage({ params }: Props) {
             Back to event
           </Link>
 
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-display font-bold text-white mb-2">
-                {event.title}
-              </h1>
-              <p className="text-dark-300">
-                {format(eventDate, "EEEE, MMMM d, yyyy 'at' h:mm a")}
-              </p>
-            </div>
-
-
-          </div>
+          <h1 className="text-3xl font-display font-bold text-white mb-2">
+            {event.title}
+          </h1>
+          <p className="text-dark-300">
+            {format(eventDate, "EEEE, MMMM d, yyyy 'at' h:mm a")}
+          </p>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-3 gap-4 mb-8">
           <div className="glass rounded-2xl p-5">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
@@ -158,17 +130,6 @@ export default async function EventManagePage({ params }: Props) {
             </div>
             <p className="text-3xl font-bold text-white">{counts.waitlist}</p>
           </div>
-
-          <div className="glass rounded-2xl p-5">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-xl bg-accent-500/20 flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-accent-400" />
-              </div>
-              <span className="text-sm text-dark-300">Checked In</span>
-            </div>
-            <p className="text-3xl font-bold text-white">{totalCheckedIn}</p>
-            <p className="text-sm text-dark-400">{checkinRate}% of going</p>
-          </div>
         </div>
 
         {/* Capacity Progress */}
@@ -191,84 +152,19 @@ export default async function EventManagePage({ params }: Props) {
           </div>
         )}
 
-        {/* Tabs content */}
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* RSVPs */}
-          <div className="glass rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-white flex items-center gap-2">
-                <Users className="w-5 h-5 text-accent-400" />
-                RSVPs
-              </h3>
-              <button className="flex items-center gap-2 px-3 py-1.5 text-sm text-dark-300 hover:text-white bg-dark-700 hover:bg-dark-600 rounded-lg transition-colors">
-                <Download className="w-4 h-4" />
-                Export
-              </button>
-            </div>
-            <AttendeesList attendees={rsvps} showCheckinStatus={true} maxDisplay={50} />
+        {/* RSVPs List */}
+        <div className="glass rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-semibold text-white flex items-center gap-2">
+              <Users className="w-5 h-5 text-accent-400" />
+              RSVPs
+            </h3>
+            <button className="flex items-center gap-2 px-3 py-1.5 text-sm text-dark-300 hover:text-white bg-dark-700 hover:bg-dark-600 rounded-lg transition-colors">
+              <Download className="w-4 h-4" />
+              Export
+            </button>
           </div>
-
-          {/* Check-ins & Actions */}
-          <div className="space-y-6">
-            {/* Manual check-in */}
-            <div className="glass rounded-2xl p-6">
-              <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-400" />
-                Manual Check-in
-              </h3>
-              <CheckInActions eventId={id} rsvps={rsvps} />
-            </div>
-
-            {/* Recent check-ins */}
-            <div className="glass rounded-2xl p-6">
-              <h3 className="text-xl font-semibold text-white mb-4">
-                Recent Check-ins
-              </h3>
-              {checkins.length > 0 ? (
-                <div className="space-y-3 max-h-80 overflow-y-auto">
-                  {checkins.slice(0, 10).map((checkin) => (
-                    <div
-                      key={checkin.id}
-                      className="flex items-center justify-between p-3 bg-dark-800/50 rounded-xl"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-dark-700 overflow-hidden">
-                          {checkin.user?.avatar_url ? (
-                            <Image
-                              src={checkin.user.avatar_url}
-                              alt={checkin.user.full_name || "User"}
-                              width={40}
-                              height={40}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Users className="w-5 h-5 text-dark-400" />
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-medium text-white">
-                            {checkin.user?.full_name || "Unknown"}
-                          </p>
-                          <p className="text-xs text-dark-400">
-                            {checkin.check_in_method === "qr" ? "QR" : "Manual"}
-                          </p>
-                        </div>
-                      </div>
-                      <p className="text-sm text-dark-400">
-                        {format(new Date(checkin.checked_in_at), "h:mm a")}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-dark-400 text-center py-8">
-                  No check-ins yet
-                </p>
-              )}
-            </div>
-          </div>
+          <AttendeesList attendees={rsvps} showCheckinStatus={false} maxDisplay={100} />
         </div>
       </div>
     </div>
