@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { isSocietyModerator } from "@/lib/auth/roles";
-import { RSVPButton } from "@/components/events/RSVPButton";
+import { RSVPSection } from "@/components/events/RSVPSection";
 import { AttendeesList, AttendeesPreview } from "@/components/events/AttendeesList";
 import { format } from "date-fns";
 import {
@@ -14,7 +14,6 @@ import {
   ArrowLeft,
   Settings,
   CheckCircle,
-  AlertCircle,
 } from "lucide-react";
 import type { Event, Society, EventRSVP, Profile, RSVPWithUser } from "@/types/database";
 
@@ -111,7 +110,6 @@ export default async function EventPage({ params }: Props) {
 
   // Capacity info
   const totalAttending = counts.going + counts.total_guests;
-  const spotsLeft = event.capacity ? event.capacity - totalAttending : null;
   const isAtCapacity = event.capacity && totalAttending >= event.capacity;
 
   return (
@@ -266,85 +264,13 @@ export default async function EventPage({ params }: Props) {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* RSVP Card */}
-            <div className="glass rounded-3xl p-6 sticky top-28">
-              {/* Attendee Stats */}
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-4 text-center">
-                  <div className="flex items-center justify-center gap-2 mb-1">
-                    <CheckCircle className="w-4 h-4 text-green-400" />
-                    <span className="text-2xl font-bold text-white">{counts.going}</span>
-                  </div>
-                  <p className="text-xs text-green-400 font-medium">Going</p>
-                </div>
-                <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 text-center">
-                  <div className="flex items-center justify-center gap-2 mb-1">
-                    <Clock className="w-4 h-4 text-amber-400" />
-                    <span className="text-2xl font-bold text-white">{counts.maybe}</span>
-                  </div>
-                  <p className="text-xs text-amber-400 font-medium">Maybe</p>
-                </div>
-              </div>
-              
-              {counts.waitlist > 0 && (
-                <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 mb-6 text-center">
-                  <span className="text-sm text-blue-400">
-                    <Users className="w-4 h-4 inline mr-1" />
-                    {counts.waitlist} on waitlist
-                  </span>
-                </div>
-              )}
-
-              {/* Capacity indicator */}
-              {event.capacity && (
-                <div className="mb-6">
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-dark-400">Capacity</span>
-                    <span className="text-white font-medium">
-                      {totalAttending} / {event.capacity}
-                    </span>
-                  </div>
-                  <div className="h-2 bg-dark-700 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full transition-all ${
-                        isAtCapacity ? "bg-amber-500" : "bg-accent-500"
-                      }`}
-                      style={{
-                        width: `${Math.min(100, (totalAttending / event.capacity) * 100)}%`,
-                      }}
-                    />
-                  </div>
-                  {spotsLeft !== null && spotsLeft > 0 && (
-                    <p className="text-sm text-green-400 mt-2">
-                      {spotsLeft} spot{spotsLeft !== 1 ? "s" : ""} left
-                    </p>
-                  )}
-                  {counts.waitlist > 0 && (
-                    <p className="text-sm text-blue-400 mt-1">
-                      {counts.waitlist} on waitlist
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* RSVP deadline warning */}
-              {event.rsvp_deadline && new Date(event.rsvp_deadline) > new Date() && (
-                <div className="mb-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-amber-200">
-                    RSVP by {format(new Date(event.rsvp_deadline), "MMM d, h:mm a")}
-                  </p>
-                </div>
-              )}
-
-              {/* RSVP Button */}
-              <RSVPButton
-                event={event}
-                userRSVP={userRSVP}
-                rsvpCount={counts}
-                isLoggedIn={!!user}
-              />
-            </div>
+            {/* RSVP Card - Now a single client component */}
+            <RSVPSection
+              event={event}
+              userRSVP={userRSVP}
+              rsvpCount={counts}
+              isLoggedIn={!!user}
+            />
           </div>
         </div>
       </div>
