@@ -12,9 +12,7 @@ import {
   TrendingUp,
   Calendar,
   Zap,
-  ArrowRight,
   Flame,
-  Clock,
 } from "lucide-react";
 
 interface ProfileData {
