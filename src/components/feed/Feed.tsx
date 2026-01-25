@@ -241,7 +241,8 @@ function EventHorizontalCard({ item }: { item: EventFeedItem }) {
             src={item.image_url}
             alt={item.title}
             fill
-            className="object-cover transition-transform duration-500 group-hover:scale-110"
+            className="object-cover transition-transform duration-500 group-hover:scale-105 will-change-transform backface-hidden"
+            style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
           />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-accent-700 to-dark-800" />
