@@ -167,6 +167,7 @@ export interface Database {
           description: string | null;
           image_url: string | null;
           location: string | null;
+          venue: string | null;
           start_time: string;
           end_time: string | null;
           is_public: boolean;
@@ -188,6 +189,7 @@ export interface Database {
           description?: string | null;
           image_url?: string | null;
           location?: string | null;
+          venue?: string | null;
           start_time: string;
           end_time?: string | null;
           is_public?: boolean;
@@ -209,6 +211,7 @@ export interface Database {
           description?: string | null;
           image_url?: string | null;
           location?: string | null;
+          venue?: string | null;
           start_time?: string;
           end_time?: string | null;
           is_public?: boolean;

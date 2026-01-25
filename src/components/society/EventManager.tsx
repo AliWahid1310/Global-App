@@ -21,6 +21,7 @@ export function EventManager({ societyId, events }: EventManagerProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
+  const [venue, setVenue] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -63,6 +64,7 @@ export function EventManager({ societyId, events }: EventManagerProps) {
     setTitle("");
     setDescription("");
     setLocation("");
+    setVenue("");
     setStartTime("");
     setEndTime("");
     setImageFile(null);
@@ -98,6 +100,7 @@ export function EventManager({ societyId, events }: EventManagerProps) {
         title,
         description,
         location,
+        venue: venue || null,
         start_time: new Date(startTime).toISOString(),
         end_time: endTime ? new Date(endTime).toISOString() : null,
         image_url: imageUrl,
@@ -117,6 +120,7 @@ export function EventManager({ societyId, events }: EventManagerProps) {
         title,
         description,
         location,
+        venue: venue || null,
         start_time: new Date(startTime).toISOString(),
         end_time: endTime ? new Date(endTime).toISOString() : null,
         image_url: imageUrl,
@@ -254,7 +258,20 @@ export function EventManager({ societyId, events }: EventManagerProps) {
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 className="w-full px-4 py-2.5 bg-dark-900 border border-dark-600 rounded-xl text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm"
-                placeholder="Where is it happening?"
+                placeholder="University or city"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-dark-200 mb-1">
+                Venue
+              </label>
+              <input
+                type="text"
+                value={venue}
+                onChange={(e) => setVenue(e.target.value)}
+                className="w-full px-4 py-2.5 bg-dark-900 border border-dark-600 rounded-xl text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm"
+                placeholder="Main Auditorium, Hall 1, etc."
               />
             </div>
 
