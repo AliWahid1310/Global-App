@@ -9,6 +9,12 @@ import {
   Users, 
   Plus,
   Bell,
+  TrendingUp,
+  Calendar,
+  Zap,
+  ArrowRight,
+  Flame,
+  Clock,
 } from "lucide-react";
 
 interface ProfileData {
@@ -195,6 +201,141 @@ export default async function FeedPage() {
             ) : (
               <Feed initialItems={items} initialHasMore={hasMore} />
             )}
+          </div>
+
+          {/* Right Sidebar - Trending & Suggestions */}
+          <div className="hidden lg:block space-y-6">
+            {/* Trending Topics */}
+            <div className="glass rounded-3xl p-5 sticky top-28">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20">
+                  <Flame className="w-5 h-5 text-orange-400" />
+                </div>
+                <h3 className="font-semibold text-white">Trending Now</h3>
+              </div>
+              
+              <div className="space-y-3">
+                {[
+                  { tag: "Freshers Week", posts: 128, hot: true },
+                  { tag: "Career Fair 2026", posts: 89 },
+                  { tag: "Study Groups", posts: 67 },
+                  { tag: "Basketball League", posts: 45 },
+                  { tag: "Cultural Night", posts: 34 },
+                ].map((topic, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between p-3 rounded-xl hover:bg-dark-800/50 transition-colors cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-medium text-dark-500">#{i + 1}</span>
+                      <div>
+                        <p className="text-sm font-medium text-white group-hover:text-accent-400 transition-colors flex items-center gap-2">
+                          {topic.tag}
+                          {topic.hot && (
+                            <span className="px-1.5 py-0.5 text-[10px] font-bold bg-gradient-to-r from-orange-500 to-red-500 rounded-full text-white">
+                              HOT
+                            </span>
+                          )}
+                        </p>
+                        <p className="text-xs text-dark-400">{topic.posts} posts</p>
+                      </div>
+                    </div>
+                    <TrendingUp className="w-4 h-4 text-green-400" />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="glass rounded-3xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-accent-500/20 to-purple-500/20">
+                  <Zap className="w-5 h-5 text-accent-400" />
+                </div>
+                <h3 className="font-semibold text-white">Quick Actions</h3>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-2">
+                <Link
+                  href="/events"
+                  className="flex flex-col items-center gap-2 p-4 rounded-xl bg-dark-800/50 hover:bg-dark-700/50 transition-all hover:scale-105 group"
+                >
+                  <Calendar className="w-6 h-6 text-purple-400 group-hover:text-purple-300" />
+                  <span className="text-xs text-dark-300 group-hover:text-white">Events</span>
+                </Link>
+                <Link
+                  href="/societies"
+                  className="flex flex-col items-center gap-2 p-4 rounded-xl bg-dark-800/50 hover:bg-dark-700/50 transition-all hover:scale-105 group"
+                >
+                  <Users className="w-6 h-6 text-blue-400 group-hover:text-blue-300" />
+                  <span className="text-xs text-dark-300 group-hover:text-white">Societies</span>
+                </Link>
+                <Link
+                  href="/dashboard/societies/create"
+                  className="flex flex-col items-center gap-2 p-4 rounded-xl bg-dark-800/50 hover:bg-dark-700/50 transition-all hover:scale-105 group"
+                >
+                  <Plus className="w-6 h-6 text-green-400 group-hover:text-green-300" />
+                  <span className="text-xs text-dark-300 group-hover:text-white">Create</span>
+                </Link>
+                <Link
+                  href="/profile"
+                  className="flex flex-col items-center gap-2 p-4 rounded-xl bg-dark-800/50 hover:bg-dark-700/50 transition-all hover:scale-105 group"
+                >
+                  <Sparkles className="w-6 h-6 text-amber-400 group-hover:text-amber-300" />
+                  <span className="text-xs text-dark-300 group-hover:text-white">Profile</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* Suggested Societies */}
+            <div className="glass rounded-3xl p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20">
+                    <Users className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <h3 className="font-semibold text-white">Discover</h3>
+                </div>
+                <Link href="/societies" className="text-xs text-accent-400 hover:text-accent-300">
+                  See all
+                </Link>
+              </div>
+              
+              <div className="space-y-3">
+                {[
+                  { name: "Tech Innovators", members: "2.3k", color: "from-blue-500 to-cyan-500" },
+                  { name: "Music Society", members: "1.8k", color: "from-purple-500 to-pink-500" },
+                  { name: "Debate Club", members: "1.2k", color: "from-orange-500 to-red-500" },
+                ].map((society, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-dark-800/50 transition-colors group"
+                  >
+                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${society.color} flex items-center justify-center`}>
+                      <span className="text-sm font-bold text-white">{society.name[0]}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-white truncate">{society.name}</p>
+                      <p className="text-xs text-dark-400">{society.members} members</p>
+                    </div>
+                    <button className="px-3 py-1.5 text-xs font-medium bg-accent-600 hover:bg-accent-500 text-white rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+                      Join
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Footer Links */}
+            <div className="px-2">
+              <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-dark-500">
+                <a href="#" className="hover:text-dark-300">About</a>
+                <a href="#" className="hover:text-dark-300">Privacy</a>
+                <a href="#" className="hover:text-dark-300">Terms</a>
+                <a href="#" className="hover:text-dark-300">Help</a>
+              </div>
+              <p className="text-xs text-dark-600 mt-2">© 2026 Circl</p>
+            </div>
           </div>
         </div>
       </div>
