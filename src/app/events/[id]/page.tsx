@@ -12,9 +12,7 @@ import {
   MapPin,
   Users,
   ArrowLeft,
-  Share2,
   Settings,
-  Bell,
   CheckCircle,
   AlertCircle,
 } from "lucide-react";
@@ -54,13 +52,19 @@ export default async function EventPage({ params }: Props) {
     ? await isSocietyModerator(user.id, event.society_id)
     : false;
 
-  // Get RSVP counts
-  const { data: rsvpCountsData } = await supabase.rpc("get_event_rsvp_counts", {
-    p_event_id: id,
-  } as any);
+  // Fetch all RSVPs to calculate counts
+  const { data: allRsvps } = await supabase
+    .from("event_rsvps")
+    .select("status, guest_count")
+    .eq("event_id", id);
 
-  const rsvpCounts = rsvpCountsData as { going: number; maybe: number; waitlist: number; total_guests: number } | null;
-  const counts = rsvpCounts || { going: 0, maybe: 0, waitlist: 0, total_guests: 0 };
+  const rsvpList = allRsvps || [];
+  const counts = {
+    going: rsvpList.filter(r => r.status === "going").length,
+    maybe: rsvpList.filter(r => r.status === "maybe").length,
+    waitlist: rsvpList.filter(r => r.status === "waitlist").length,
+    total_guests: rsvpList.reduce((sum, r) => sum + (r.guest_count || 0), 0),
+  };
 
   // Get user's RSVP
   let userRSVP: EventRSVP | null = null;
@@ -264,25 +268,32 @@ export default async function EventPage({ params }: Props) {
           <div className="space-y-6">
             {/* RSVP Card */}
             <div className="glass rounded-3xl p-6 sticky top-28">
-              <h3 className="text-lg font-semibold text-white mb-4">Join this event</h3>
-
-              {/* Stats */}
-              <div className="flex items-center gap-6 mb-6 pb-6 border-b border-dark-700">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-white">{counts.going}</p>
-                  <p className="text-xs text-dark-400">going</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-white">{counts.maybe}</p>
-                  <p className="text-xs text-dark-400">maybe</p>
-                </div>
-                {counts.waitlist > 0 && (
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-white">{counts.waitlist}</p>
-                    <p className="text-xs text-dark-400">waitlist</p>
+              {/* Attendee Stats */}
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-4 text-center">
+                  <div className="flex items-center justify-center gap-2 mb-1">
+                    <CheckCircle className="w-4 h-4 text-green-400" />
+                    <span className="text-2xl font-bold text-white">{counts.going}</span>
                   </div>
-                )}
+                  <p className="text-xs text-green-400 font-medium">Going</p>
+                </div>
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 text-center">
+                  <div className="flex items-center justify-center gap-2 mb-1">
+                    <Clock className="w-4 h-4 text-amber-400" />
+                    <span className="text-2xl font-bold text-white">{counts.maybe}</span>
+                  </div>
+                  <p className="text-xs text-amber-400 font-medium">Maybe</p>
+                </div>
               </div>
+              
+              {counts.waitlist > 0 && (
+                <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 mb-6 text-center">
+                  <span className="text-sm text-blue-400">
+                    <Users className="w-4 h-4 inline mr-1" />
+                    {counts.waitlist} on waitlist
+                  </span>
+                </div>
+              )}
 
               {/* Capacity indicator */}
               {event.capacity && (
@@ -333,14 +344,6 @@ export default async function EventPage({ params }: Props) {
                 rsvpCount={counts}
                 isLoggedIn={!!user}
               />
-
-              {/* Share */}
-              <div className="mt-4 pt-4 border-t border-dark-700">
-                <button className="flex items-center justify-center gap-2 w-full py-3 text-dark-300 hover:text-white transition-colors">
-                  <Share2 className="w-4 h-4" />
-                  Share Event
-                </button>
-              </div>
             </div>
           </div>
         </div>
