@@ -6,7 +6,7 @@ import { AnnouncementFeedCard } from "./AnnouncementFeedCard";
 import type { FeedItem, EventFeedItem, AnnouncementFeedItem } from "@/types/database";
 import type { RSVPStatus } from "@/types/database";
 import { rsvpToEvent, cancelRSVP } from "@/lib/actions/events";
-import { Loader2, Inbox, Flame, Megaphone, Camera, ChevronRight, X } from "lucide-react";
+import { Loader2, Inbox, Flame, Megaphone, ChevronRight, X } from "lucide-react";
 import Image from "next/image";
 
 interface FeedProps {
@@ -19,15 +19,11 @@ export function Feed({ initialItems, initialHasMore }: FeedProps) {
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [selectedImage, setSelectedImage] = useState<{ url: string; title: string } | null>(null);
   const loaderRef = useRef<HTMLDivElement>(null);
 
   // Separate items by type
   const events = items.filter((item) => item.type === "event") as EventFeedItem[];
   const announcements = items.filter((item) => item.type === "announcement") as AnnouncementFeedItem[];
-  
-  // Get posts with images for "Campus Moments"
-  const moments = announcements.filter((item) => item.image_url);
 
   const loadMore = useCallback(async () => {
     if (loading || !hasMore) return;
@@ -148,76 +144,6 @@ export function Feed({ initialItems, initialHasMore }: FeedProps) {
             ))}
           </div>
         </section>
-      )}
-
-      {/* ========== CAMPUS MOMENTS SECTION - Instagram Grid ========== */}
-      {moments.length > 0 && (
-        <section className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: "400ms" }}>
-          <div className="flex items-center justify-between mb-5">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-gradient-to-br from-pink-500/20 to-orange-500/20 rounded-2xl">
-                <Camera className="w-6 h-6 text-pink-400" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-white">Campus Moments 📸</h2>
-                <p className="text-sm text-dark-400">Photos from your community</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {moments.slice(0, 6).map((moment, index) => (
-              <button
-                key={moment.id}
-                onClick={() => setSelectedImage({ url: moment.image_url!, title: moment.title })}
-                className="relative aspect-square rounded-2xl overflow-hidden group cursor-pointer animate-in fade-in zoom-in-95 duration-500"
-                style={{ animationDelay: `${500 + index * 50}ms` }}
-              >
-                <Image
-                  src={moment.image_url!}
-                  alt={moment.title}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-dark-900/90 via-dark-900/0 to-dark-900/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                  <p className="text-sm font-medium text-white line-clamp-2">{moment.title}</p>
-                  <p className="text-xs text-dark-300">{moment.society_name}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* ========== IMAGE MODAL ========== */}
-      {selectedImage && (
-        <div 
-          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
-          onClick={() => setSelectedImage(null)}
-        >
-          <button
-            onClick={() => setSelectedImage(null)}
-            className="absolute top-4 right-4 p-2 bg-dark-800/80 hover:bg-dark-700/80 rounded-full transition-colors"
-          >
-            <X className="w-6 h-6 text-white" />
-          </button>
-          <div 
-            className="relative max-w-4xl max-h-[85vh] animate-in zoom-in-95 duration-300"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Image
-              src={selectedImage.url}
-              alt={selectedImage.title}
-              width={1200}
-              height={800}
-              className="rounded-2xl object-contain max-h-[85vh] w-auto"
-            />
-            <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent rounded-b-2xl">
-              <p className="text-lg font-medium text-white">{selectedImage.title}</p>
-            </div>
-          </div>
-        </div>
       )}
 
       {/* Loader / End of feed */}
