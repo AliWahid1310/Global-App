@@ -30,17 +30,30 @@ interface RSVPButtonProps {
 
 export function RSVPButton({
   event,
-  userRSVP,
-  rsvpCount,
+  userRSVP: initialUserRSVP,
+  rsvpCount: initialRsvpCount,
   isLoggedIn,
 }: RSVPButtonProps) {
-  const [loading, setLoading] = useState(false);
+  // Optimistic state
+  const [optimisticRSVP, setOptimisticRSVP] = useState<{
+    status: RSVPStatus | null;
+    guest_count: number;
+  } | null>(null);
+  const [optimisticCount, setOptimisticCount] = useState(initialRsvpCount);
+  
+  const [loading, setLoading] = useState<RSVPStatus | "cancel" | null>(null);
   const [showOptions, setShowOptions] = useState(false);
   const [showGuestModal, setShowGuestModal] = useState(false);
-  const [guestCount, setGuestCount] = useState(userRSVP?.guest_count || 0);
+  const [guestCount, setGuestCount] = useState(initialUserRSVP?.guest_count || 0);
   const [pendingStatus, setPendingStatus] = useState<RSVPStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  // Use optimistic state if available, otherwise initial
+  const userRSVP = optimisticRSVP !== null 
+    ? (optimisticRSVP.status ? { ...initialUserRSVP, status: optimisticRSVP.status, guest_count: optimisticRSVP.guest_count } as EventRSVP : null)
+    : initialUserRSVP;
+  const rsvpCount = optimisticCount;
 
   const isAtCapacity =
     event.capacity &&
@@ -63,43 +76,95 @@ export function RSVPButton({
       return;
     }
 
-    setLoading(true);
+    const previousRSVP = optimisticRSVP !== null ? optimisticRSVP : (initialUserRSVP ? { status: initialUserRSVP.status as RSVPStatus, guest_count: initialUserRSVP.guest_count } : null);
+    const previousCount = { ...optimisticCount };
+
+    setLoading(status);
     setShowOptions(false);
     setShowGuestModal(false);
     setError(null);
 
+    // Optimistic update
+    const newCount = { ...rsvpCount };
+    if (previousRSVP?.status === "going") {
+      newCount.going -= 1;
+      newCount.total_guests -= (previousRSVP.guest_count || 0);
+    }
+    if (previousRSVP?.status === "maybe") newCount.maybe -= 1;
+    if (previousRSVP?.status === "waitlist") newCount.waitlist -= 1;
+    
+    if (status === "going") {
+      newCount.going += 1;
+      newCount.total_guests += guestCount;
+    }
+    if (status === "maybe") newCount.maybe += 1;
+    if (status === "waitlist") newCount.waitlist += 1;
+
+    setOptimisticRSVP({ status, guest_count: guestCount });
+    setOptimisticCount(newCount);
+
     try {
       const result = await rsvpToEvent(event.id, status, guestCount);
       if (result.error) {
+        // Revert on error
+        setOptimisticRSVP(previousRSVP);
+        setOptimisticCount(previousCount);
         setError(result.error);
         console.error("RSVP error:", result.error);
       } else {
+        // Background refresh to sync with server
         router.refresh();
       }
     } catch (err) {
+      // Revert on error
+      setOptimisticRSVP(previousRSVP);
+      setOptimisticCount(previousCount);
       setError("Failed to RSVP. Please try again.");
       console.error("RSVP failed:", err);
     } finally {
-      setLoading(false);
+      setLoading(null);
       setPendingStatus(null);
     }
   };
 
   const handleCancel = async () => {
-    setLoading(true);
+    const previousRSVP = optimisticRSVP !== null ? optimisticRSVP : (initialUserRSVP ? { status: initialUserRSVP.status as RSVPStatus, guest_count: initialUserRSVP.guest_count } : null);
+    const previousCount = { ...optimisticCount };
+
+    setLoading("cancel");
+    setShowOptions(false);
     setError(null);
+
+    // Optimistic update
+    const newCount = { ...rsvpCount };
+    if (previousRSVP?.status === "going") {
+      newCount.going -= 1;
+      newCount.total_guests -= (previousRSVP.guest_count || 0);
+    }
+    if (previousRSVP?.status === "maybe") newCount.maybe -= 1;
+    if (previousRSVP?.status === "waitlist") newCount.waitlist -= 1;
+
+    setOptimisticRSVP({ status: null, guest_count: 0 });
+    setOptimisticCount(newCount);
+
     try {
       const result = await cancelRSVP(event.id);
       if (result.error) {
+        // Revert on error
+        setOptimisticRSVP(previousRSVP);
+        setOptimisticCount(previousCount);
         setError(result.error);
       } else {
         router.refresh();
       }
     } catch (err) {
+      // Revert on error
+      setOptimisticRSVP(previousRSVP);
+      setOptimisticCount(previousCount);
       setError("Failed to cancel RSVP. Please try again.");
       console.error("Cancel RSVP failed:", err);
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   };
 
@@ -133,7 +198,7 @@ export function RSVPButton({
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowOptions(!showOptions)}
-            disabled={loading}
+            disabled={loading !== null}
             className={`flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all ${
               userRSVP.status === "going"
                 ? "bg-green-500/20 text-green-400 border border-green-500/30"
@@ -144,7 +209,7 @@ export function RSVPButton({
                 : "bg-dark-700 text-dark-300 border border-dark-600"
             }`}
           >
-            {loading ? (
+            {loading !== null ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : userRSVP.status === "going" ? (
               <Check className="w-4 h-4" />
@@ -221,10 +286,10 @@ export function RSVPButton({
       <div className="flex items-center gap-2">
         <button
           onClick={() => handleRSVP("going")}
-          disabled={loading || (isAtCapacity && !event.capacity) || false}
+          disabled={loading !== null}
           className="flex items-center gap-2 px-6 py-3 bg-accent-500 hover:bg-accent-600 text-white rounded-xl font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed btn-glow"
         >
-          {loading ? (
+          {loading === "going" ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
             <Calendar className="w-4 h-4" />
@@ -233,7 +298,8 @@ export function RSVPButton({
         </button>
         <button
           onClick={() => setShowOptions(!showOptions)}
-          className="p-3 bg-dark-700 hover:bg-dark-600 rounded-xl transition-colors"
+          disabled={loading !== null}
+          className="p-3 bg-dark-700 hover:bg-dark-600 rounded-xl transition-colors disabled:opacity-50"
         >
           <ChevronDown className="w-4 h-4 text-dark-300" />
         </button>
@@ -333,10 +399,10 @@ export function RSVPButton({
               </button>
               <button
                 onClick={confirmGuestRSVP}
-                disabled={loading}
+                disabled={loading !== null}
                 className="flex-1 px-4 py-2 bg-accent-500 text-white rounded-lg hover:bg-accent-600 transition-colors flex items-center justify-center gap-2"
               >
-                {loading ? (
+                {loading === "going" ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   "Confirm"
