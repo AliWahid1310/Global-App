@@ -290,7 +290,7 @@ export function EventManager({ societyId, events }: EventManagerProps) {
                 <div className="mt-4 space-y-4 p-4 bg-dark-900/50 rounded-xl">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-sm font-medium text-dark-200 mb-1">
+                      <label className="block text-sm font-medium text-dark-200 mb-1.5">
                         Capacity (optional)
                       </label>
                       <input
@@ -303,7 +303,7 @@ export function EventManager({ societyId, events }: EventManagerProps) {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-dark-200 mb-1">
+                      <label className="block text-sm font-medium text-dark-200 mb-1.5">
                         RSVP Deadline
                       </label>
                       <input
@@ -350,26 +350,6 @@ export function EventManager({ societyId, events }: EventManagerProps) {
                       />
                     </div>
                   )}
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-dark-200">QR Check-in</p>
-                      <p className="text-xs text-dark-400">Enable QR code check-in at the door</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setCheckInEnabled(!checkInEnabled)}
-                      className={`relative w-12 h-6 rounded-full transition-colors ${
-                        checkInEnabled ? "bg-accent-500" : "bg-dark-600"
-                      }`}
-                    >
-                      <span
-                        className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                          checkInEnabled ? "left-7" : "left-1"
-                        }`}
-                      />
-                    </button>
-                  </div>
                 </div>
               )}
             </div>
