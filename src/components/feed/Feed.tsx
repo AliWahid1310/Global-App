@@ -126,7 +126,7 @@ export function Feed({ initialItems, initialHasMore }: FeedProps) {
       )}
 
       {/* Rest of Feed Items */}
-      <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
+      <div className="grid gap-5 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {restItems.map((item, index) => (
           <div
             key={`${item.type}-${item.id}`}

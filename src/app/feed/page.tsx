@@ -161,7 +161,7 @@ export default async function FeedPage() {
           </div>
 
           {/* Main Feed */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             {/* Feed Header */}
             <div className="flex items-center justify-between mb-8">
               <div>
