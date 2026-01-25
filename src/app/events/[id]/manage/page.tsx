@@ -53,14 +53,6 @@ export default async function EventManagePage({ params }: Props) {
     redirect(`/events/${id}`);
   }
 
-  // Get RSVP counts
-  const { data: rsvpCountsData } = await supabase.rpc("get_event_rsvp_counts", {
-    p_event_id: id,
-  } as any);
-
-  const rsvpCounts = rsvpCountsData as { going: number; maybe: number; waitlist: number; total_guests: number } | null;
-  const counts = rsvpCounts || { going: 0, maybe: 0, waitlist: 0, total_guests: 0 };
-
   // Fetch all RSVPs with user info
   const { data: rsvpsData } = await supabase
     .from("event_rsvps")
@@ -72,6 +64,14 @@ export default async function EventManagePage({ params }: Props) {
     .order("created_at", { ascending: true });
 
   const rsvps = (rsvpsData || []) as RSVPWithUser[];
+
+  // Calculate counts from fetched RSVPs
+  const counts = {
+    going: rsvps.filter(r => r.status === "going").length,
+    maybe: rsvps.filter(r => r.status === "maybe").length,
+    waitlist: rsvps.filter(r => r.status === "waitlist").length,
+    total_guests: rsvps.reduce((sum, r) => sum + (r.guest_count || 0), 0),
+  };
 
   const eventDate = new Date(event.start_time);
 
