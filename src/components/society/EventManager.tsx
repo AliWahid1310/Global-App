@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { uploadToCloudinary } from "@/lib/cloudinary/upload";
 import { ImageUpload } from "@/components/ui/ImageUpload";
 import type { Event } from "@/types/database";
-import { Plus, Loader2, Trash2, X, Calendar, MapPin } from "lucide-react";
+import { Plus, Loader2, Trash2, X, Calendar, MapPin, Users, Settings, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
 
 interface EventManagerProps {
@@ -16,12 +17,20 @@ interface EventManagerProps {
 
 export function EventManager({ societyId, events }: EventManagerProps) {
   const [showForm, setShowForm] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
+  // New RSVP fields
+  const [capacity, setCapacity] = useState<string>("");
+  const [rsvpDeadline, setRsvpDeadline] = useState("");
+  const [allowGuests, setAllowGuests] = useState(false);
+  const [maxGuestsPerRsvp, setMaxGuestsPerRsvp] = useState("2");
+  const [checkInEnabled, setCheckInEnabled] = useState(true);
+  
   const [loading, setLoading] = useState(false);
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [optimisticEvents, setOptimisticEvents] = useState<Event[]>([]);
@@ -31,6 +40,21 @@ export function EventManager({ societyId, events }: EventManagerProps) {
 
   // Combine real events with optimistic ones, excluding deleted
   const displayEvents = [...optimisticEvents, ...events.filter(e => !deletedIds.includes(e.id))];
+
+  const resetForm = () => {
+    setTitle("");
+    setDescription("");
+    setLocation("");
+    setStartTime("");
+    setEndTime("");
+    setImageFile(null);
+    setCapacity("");
+    setRsvpDeadline("");
+    setAllowGuests(false);
+    setMaxGuestsPerRsvp("2");
+    setCheckInEnabled(true);
+    setShowAdvanced(false);
+  };
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,6 +84,11 @@ export function EventManager({ societyId, events }: EventManagerProps) {
         end_time: endTime ? new Date(endTime).toISOString() : null,
         image_url: imageUrl,
         is_public: true,
+        capacity: capacity ? parseInt(capacity) : null,
+        rsvp_deadline: rsvpDeadline ? new Date(rsvpDeadline).toISOString() : null,
+        allow_guests: allowGuests,
+        max_guests_per_rsvp: allowGuests ? parseInt(maxGuestsPerRsvp) : 0,
+        check_in_enabled: checkInEnabled,
       };
 
       // Create optimistic event
@@ -74,18 +103,20 @@ export function EventManager({ societyId, events }: EventManagerProps) {
         end_time: endTime ? new Date(endTime).toISOString() : null,
         image_url: imageUrl,
         is_public: true,
+        capacity: capacity ? parseInt(capacity) : null,
+        rsvp_deadline: rsvpDeadline ? new Date(rsvpDeadline).toISOString() : null,
+        requires_approval: false,
+        allow_guests: allowGuests,
+        max_guests_per_rsvp: allowGuests ? parseInt(maxGuestsPerRsvp) : 0,
+        check_in_enabled: checkInEnabled,
+        event_code: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
 
       // Show optimistic update immediately
       setOptimisticEvents(prev => [optimisticEvent, ...prev]);
-      setTitle("");
-      setDescription("");
-      setLocation("");
-      setStartTime("");
-      setEndTime("");
-      setImageFile(null);
+      resetForm();
       setShowForm(false);
 
       const { error } = await (supabase.from("events") as any).insert(eventData);
@@ -239,6 +270,110 @@ export function EventManager({ societyId, events }: EventManagerProps) {
               <ImageUpload onFileSelect={setImageFile} aspectRatio="banner" />
             </div>
 
+            {/* Advanced Options */}
+            <div className="border-t border-dark-700 pt-4">
+              <button
+                type="button"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="flex items-center gap-2 text-sm text-dark-300 hover:text-white transition-colors"
+              >
+                <Settings className="w-4 h-4" />
+                RSVP & Check-in Options
+                {showAdvanced ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
+              </button>
+
+              {showAdvanced && (
+                <div className="mt-4 space-y-4 p-4 bg-dark-900/50 rounded-xl">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-dark-200 mb-1">
+                        Capacity (optional)
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={capacity}
+                        onChange={(e) => setCapacity(e.target.value)}
+                        className="w-full px-4 py-2.5 bg-dark-900 border border-dark-600 rounded-xl text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm"
+                        placeholder="No limit"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-dark-200 mb-1">
+                        RSVP Deadline
+                      </label>
+                      <input
+                        type="datetime-local"
+                        value={rsvpDeadline}
+                        onChange={(e) => setRsvpDeadline(e.target.value)}
+                        className="w-full px-4 py-2.5 bg-dark-900 border border-dark-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm [color-scheme:dark]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-dark-200">Allow Guests</p>
+                      <p className="text-xs text-dark-400">Let attendees bring +1s</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setAllowGuests(!allowGuests)}
+                      className={`relative w-12 h-6 rounded-full transition-colors ${
+                        allowGuests ? "bg-accent-500" : "bg-dark-600"
+                      }`}
+                    >
+                      <span
+                        className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                          allowGuests ? "left-7" : "left-1"
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  {allowGuests && (
+                    <div>
+                      <label className="block text-sm font-medium text-dark-200 mb-1">
+                        Max Guests per RSVP
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={maxGuestsPerRsvp}
+                        onChange={(e) => setMaxGuestsPerRsvp(e.target.value)}
+                        className="w-24 px-4 py-2.5 bg-dark-900 border border-dark-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-dark-200">QR Check-in</p>
+                      <p className="text-xs text-dark-400">Enable QR code check-in at the door</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setCheckInEnabled(!checkInEnabled)}
+                      className={`relative w-12 h-6 rounded-full transition-colors ${
+                        checkInEnabled ? "bg-accent-500" : "bg-dark-600"
+                      }`}
+                    >
+                      <span
+                        className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                          checkInEnabled ? "left-7" : "left-1"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="flex justify-end gap-3">
               <button
                 type="button"
@@ -293,18 +428,35 @@ export function EventManager({ societyId, events }: EventManagerProps) {
                           <span className="truncate">{event.location}</span>
                         </div>
                       )}
+                      {event.capacity && (
+                        <div className="flex items-center gap-2 mt-1 text-xs text-dark-400">
+                          <Users className="h-3 w-3" />
+                          <span>Capacity: {event.capacity}</span>
+                        </div>
+                      )}
                     </div>
-                    {loadingId === event.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin text-dark-400" />
-                    ) : (
-                      <button
-                        onClick={() => handleDelete(event.id)}
-                        className="p-1.5 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors"
-                        title="Delete"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    )}
+                    <div className="flex items-center gap-1">
+                      {!event.id.startsWith('temp-') && (
+                        <Link
+                          href={`/events/${event.id}/manage`}
+                          className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-600 rounded-lg transition-colors"
+                          title="Manage"
+                        >
+                          <Settings className="h-4 w-4" />
+                        </Link>
+                      )}
+                      {loadingId === event.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-dark-400" />
+                      ) : (
+                        <button
+                          onClick={() => handleDelete(event.id)}
+                          className="p-1.5 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}

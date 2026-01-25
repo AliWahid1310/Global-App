@@ -9,6 +9,8 @@ export type Json =
 export type MemberStatus = "pending" | "approved" | "rejected";
 export type MemberRole = "member" | "moderator" | "admin";
 export type SocietyStatus = "pending" | "approved" | "rejected";
+export type RSVPStatus = "going" | "maybe" | "not_going" | "waitlist";
+export type CheckInMethod = "qr" | "manual" | "self";
 
 export interface Database {
   public: {
@@ -168,6 +170,13 @@ export interface Database {
           start_time: string;
           end_time: string | null;
           is_public: boolean;
+          capacity: number | null;
+          rsvp_deadline: string | null;
+          requires_approval: boolean;
+          allow_guests: boolean;
+          max_guests_per_rsvp: number;
+          check_in_enabled: boolean;
+          event_code: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -182,6 +191,13 @@ export interface Database {
           start_time: string;
           end_time?: string | null;
           is_public?: boolean;
+          capacity?: number | null;
+          rsvp_deadline?: string | null;
+          requires_approval?: boolean;
+          allow_guests?: boolean;
+          max_guests_per_rsvp?: number;
+          check_in_enabled?: boolean;
+          event_code?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -196,8 +212,117 @@ export interface Database {
           start_time?: string;
           end_time?: string | null;
           is_public?: boolean;
+          capacity?: number | null;
+          rsvp_deadline?: string | null;
+          requires_approval?: boolean;
+          allow_guests?: boolean;
+          max_guests_per_rsvp?: number;
+          check_in_enabled?: boolean;
+          event_code?: string | null;
           created_at?: string;
           updated_at?: string;
+        };
+      };
+      event_rsvps: {
+        Row: {
+          id: string;
+          event_id: string;
+          user_id: string;
+          status: RSVPStatus;
+          guest_count: number;
+          notes: string | null;
+          reminder_sent: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          event_id: string;
+          user_id: string;
+          status?: RSVPStatus;
+          guest_count?: number;
+          notes?: string | null;
+          reminder_sent?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          event_id?: string;
+          user_id?: string;
+          status?: RSVPStatus;
+          guest_count?: number;
+          notes?: string | null;
+          reminder_sent?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      event_checkins: {
+        Row: {
+          id: string;
+          event_id: string;
+          user_id: string;
+          rsvp_id: string | null;
+          checked_in_by: string | null;
+          check_in_method: CheckInMethod;
+          checked_in_at: string;
+          guest_count: number;
+          notes: string | null;
+        };
+        Insert: {
+          id?: string;
+          event_id: string;
+          user_id: string;
+          rsvp_id?: string | null;
+          checked_in_by?: string | null;
+          check_in_method?: CheckInMethod;
+          checked_in_at?: string;
+          guest_count?: number;
+          notes?: string | null;
+        };
+        Update: {
+          id?: string;
+          event_id?: string;
+          user_id?: string;
+          rsvp_id?: string | null;
+          checked_in_by?: string | null;
+          check_in_method?: CheckInMethod;
+          checked_in_at?: string;
+          guest_count?: number;
+          notes?: string | null;
+        };
+      };
+      event_reminders: {
+        Row: {
+          id: string;
+          event_id: string;
+          user_id: string;
+          remind_at: string;
+          reminder_type: string;
+          sent: boolean;
+          sent_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          event_id: string;
+          user_id: string;
+          remind_at: string;
+          reminder_type?: string;
+          sent?: boolean;
+          sent_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          event_id?: string;
+          user_id?: string;
+          remind_at?: string;
+          reminder_type?: string;
+          sent?: boolean;
+          sent_at?: string | null;
+          created_at?: string;
         };
       };
       chat_messages: {
@@ -228,11 +353,29 @@ export interface Database {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      get_event_rsvp_counts: {
+        Args: {
+          p_event_id: string;
+        };
+        Returns: {
+          going: number;
+          maybe: number;
+          waitlist: number;
+          total_guests: number;
+        };
+      };
+      is_event_at_capacity: {
+        Args: {
+          p_event_id: string;
+        };
+        Returns: boolean;
+      };
     };
     Enums: {
       member_status: MemberStatus;
       member_role: MemberRole;
+      rsvp_status: RSVPStatus;
+      check_in_method: CheckInMethod;
     };
   };
 }
@@ -243,6 +386,9 @@ export type Society = Database["public"]["Tables"]["societies"]["Row"];
 export type SocietyMember = Database["public"]["Tables"]["society_members"]["Row"];
 export type Post = Database["public"]["Tables"]["posts"]["Row"];
 export type Event = Database["public"]["Tables"]["events"]["Row"];
+export type EventRSVP = Database["public"]["Tables"]["event_rsvps"]["Row"];
+export type EventCheckin = Database["public"]["Tables"]["event_checkins"]["Row"];
+export type EventReminder = Database["public"]["Tables"]["event_reminders"]["Row"];
 export type ChatMessage = Database["public"]["Tables"]["chat_messages"]["Row"];
 
 // Extended types with relations
@@ -253,6 +399,28 @@ export type PostWithAuthor = Post & {
 
 export type EventWithSociety = Event & {
   society: Society;
+};
+
+export type EventWithDetails = Event & {
+  society: Society;
+  rsvp_count?: {
+    going: number;
+    maybe: number;
+    waitlist: number;
+    total_guests: number;
+  };
+  user_rsvp?: EventRSVP | null;
+  user_checkin?: EventCheckin | null;
+};
+
+export type RSVPWithUser = EventRSVP & {
+  user: Profile;
+  checkin?: EventCheckin | EventCheckin[] | null;
+};
+
+export type CheckinWithUser = EventCheckin & {
+  user: Profile;
+  checked_in_by_user?: Profile | null;
 };
 
 export type SocietyMemberWithProfile = SocietyMember & {
