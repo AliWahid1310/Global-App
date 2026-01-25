@@ -104,37 +104,37 @@ export function EventFeedCard({ item }: EventFeedCardProps) {
       </div>
 
       {/* Content */}
-      <div className="p-5 space-y-4">
-        {/* Society Info */}
+      <div className="p-5 space-y-3">
+        {/* Title - Make it prominent */}
+        <Link href={`/events/${item.id}`}>
+          <h3 className="text-xl font-bold text-white group-hover:text-accent-400 transition-colors line-clamp-2 leading-tight">
+            {item.title}
+          </h3>
+        </Link>
+
+        {/* Society Info - Below title */}
         <Link
           href={`/societies/${item.society_slug}`}
-          className="flex items-center gap-2 group/society"
+          className="inline-flex items-center gap-2 group/society"
         >
           {item.society_logo ? (
             <Image
               src={item.society_logo}
               alt={item.society_name}
-              width={28}
-              height={28}
-              className="rounded-lg ring-2 ring-dark-700 group-hover/society:ring-accent-500/50 transition-all"
+              width={20}
+              height={20}
+              className="rounded-md ring-1 ring-dark-700 group-hover/society:ring-accent-500/50 transition-all"
             />
           ) : (
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-accent-500 to-accent-700 flex items-center justify-center">
-              <span className="text-xs font-bold text-white">
+            <div className="w-5 h-5 rounded-md bg-gradient-to-br from-accent-500 to-accent-700 flex items-center justify-center">
+              <span className="text-[10px] font-bold text-white">
                 {item.society_name[0]}
               </span>
             </div>
           )}
-          <span className="text-sm text-dark-300 group-hover/society:text-accent-400 transition-colors font-medium">
+          <span className="text-xs text-dark-400 group-hover/society:text-accent-400 transition-colors">
             {item.society_name}
           </span>
-        </Link>
-
-        {/* Title */}
-        <Link href={`/events/${item.id}`}>
-          <h3 className="text-xl font-bold text-white group-hover:text-accent-400 transition-colors line-clamp-2 leading-tight">
-            {item.title}
-          </h3>
         </Link>
 
         {/* Description */}
