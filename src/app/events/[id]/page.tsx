@@ -58,7 +58,7 @@ export default async function EventPage({ params }: Props) {
     .select("status, guest_count")
     .eq("event_id", id);
 
-  const rsvpList = allRsvps || [];
+  const rsvpList = (allRsvps || []) as { status: string; guest_count: number | null }[];
   const counts = {
     going: rsvpList.filter(r => r.status === "going").length,
     maybe: rsvpList.filter(r => r.status === "maybe").length,
