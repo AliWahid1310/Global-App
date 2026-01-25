@@ -90,7 +90,7 @@ export default async function FeedPage() {
                   <p className="text-xs text-dark-400">Societies</p>
                 </div>
                 <div className="bg-dark-800/50 rounded-xl p-3 text-center">
-                  <p className="text-xl font-bold text-white">{upcomingEventsCount}</p>
+                  <p className="text-xl font-bold text-white">{items.filter(i => i.type === "event").length}</p>
                   <p className="text-xs text-dark-400">Events</p>
                 </div>
               </div>
