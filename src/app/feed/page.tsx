@@ -8,8 +8,6 @@ import {
   Sparkles, 
   Users, 
   Plus,
-  TrendingUp,
-  Calendar,
   Bell,
 } from "lucide-react";
 
@@ -52,10 +50,6 @@ export default async function FeedPage() {
 
   // Get user's societies for the sidebar
   const societies = await getUserSocieties() as SocietyData[];
-
-  // Stats
-  const upcomingEventsCount = items.filter((i) => i.type === "event").length;
-  const announcementsCount = items.filter((i) => i.type === "announcement").length;
 
   return (
     <div className="min-h-screen bg-dark-950 pt-20">
@@ -201,78 +195,6 @@ export default async function FeedPage() {
             ) : (
               <Feed initialItems={items} initialHasMore={hasMore} />
             )}
-          </div>
-
-          {/* Right Sidebar - Trending & Quick Actions */}
-          <div className="hidden lg:block space-y-6">
-            {/* Quick Actions */}
-            <div className="glass rounded-3xl p-6">
-              <h4 className="text-sm font-medium text-dark-300 mb-4 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4" />
-                Quick Actions
-              </h4>
-              <div className="space-y-2">
-                <Link
-                  href="/events"
-                  className="flex items-center gap-3 p-3 rounded-xl bg-dark-800/50 hover:bg-dark-700/50 transition-colors group"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-accent-500/20 flex items-center justify-center group-hover:bg-accent-500/30 transition-colors">
-                    <Calendar className="w-5 h-5 text-accent-400" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-white">Browse Events</p>
-                    <p className="text-xs text-dark-400">Find what's happening</p>
-                  </div>
-                </Link>
-                <Link
-                  href="/societies"
-                  className="flex items-center gap-3 p-3 rounded-xl bg-dark-800/50 hover:bg-dark-700/50 transition-colors group"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-glow/20 flex items-center justify-center group-hover:bg-glow/30 transition-colors">
-                    <Users className="w-5 h-5 text-glow" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-white">Discover Societies</p>
-                    <p className="text-xs text-dark-400">Join new communities</p>
-                  </div>
-                </Link>
-              </div>
-            </div>
-
-            {/* Feed Stats */}
-            <div className="glass rounded-3xl p-6">
-              <h4 className="text-sm font-medium text-dark-300 mb-4">Feed Summary</h4>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-accent-500" />
-                    <span className="text-sm text-dark-400">Upcoming Events</span>
-                  </div>
-                  <span className="text-sm font-semibold text-white">{upcomingEventsCount}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-glow" />
-                    <span className="text-sm text-dark-400">Announcements</span>
-                  </div>
-                  <span className="text-sm font-semibold text-white">{announcementsCount}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Mobile: Join Societies CTA */}
-            <div className="glass rounded-3xl p-6 bg-gradient-to-br from-accent-600/20 to-accent-800/20 border-accent-500/20">
-              <h4 className="font-semibold text-white mb-2">Stay Connected</h4>
-              <p className="text-sm text-dark-300 mb-4">
-                Join more societies to expand your feed and never miss an event!
-              </p>
-              <Link
-                href="/societies"
-                className="block w-full py-3 text-center bg-accent-600 hover:bg-accent-500 text-white text-sm font-semibold rounded-xl transition-colors"
-              >
-                Explore Societies
-              </Link>
-            </div>
           </div>
         </div>
       </div>
