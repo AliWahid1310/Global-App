@@ -92,23 +92,38 @@ export function HeroSection() {
         </div>
       </section>
 
-      {/* Stats Section - Below the fold */}
-      <section className="relative py-20 bg-dark-950">
+      {/* Tagline Section - Below the fold */}
+      <section className="relative py-20 bg-dark-950 overflow-hidden">
         {/* Top gradient blend */}
         <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-dark-950 to-transparent" />
         
-        <div className="relative z-10 max-w-4xl mx-auto px-6">
-          <div className="grid grid-cols-3 gap-8">
+        {/* Ambient glow effects */}
+        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-accent-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl" />
+        
+        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+          {/* Main tagline */}
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold mb-6">
+            <span className="text-white">Where </span>
+            <span className="gradient-text">communities</span>
+            <span className="text-white"> come alive</span>
+          </h2>
+          
+          {/* Feature pills */}
+          <div className="flex flex-wrap justify-center gap-3 mt-10">
             {[
-              { value: "50+", label: "Societies" },
-              { value: "2.5K", label: "Students" },
-              { value: "100+", label: "Events" },
-            ].map((stat, i) => (
-              <div key={i} className="text-center group">
-                <div className="text-4xl sm:text-5xl font-bold text-white mb-2 group-hover:text-accent-400 transition-colors">
-                  {stat.value}
-                </div>
-                <div className="text-sm sm:text-base text-dark-300">{stat.label}</div>
+              { icon: "🎯", text: "Discover societies" },
+              { icon: "🎪", text: "Join exciting events" },
+              { icon: "💬", text: "Connect with peers" },
+              { icon: "✨", text: "Build your network" },
+            ].map((item, i) => (
+              <div 
+                key={i}
+                className="flex items-center gap-2 px-5 py-2.5 glass rounded-full hover:bg-white/10 transition-all cursor-default group"
+                style={{ animationDelay: `${i * 0.1}s` }}
+              >
+                <span className="text-lg group-hover:scale-110 transition-transform">{item.icon}</span>
+                <span className="text-sm text-dark-200 group-hover:text-white transition-colors font-medium">{item.text}</span>
               </div>
             ))}
           </div>
