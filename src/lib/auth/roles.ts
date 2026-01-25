@@ -41,22 +41,32 @@ export async function getSocietyRole(
 
 /**
  * Check if user is an admin of a specific society
+ * Platform admins are considered admins of all societies
  */
 export async function isSocietyAdmin(
   userId: string,
   societyId: string
 ): Promise<boolean> {
+  // Platform admins can admin any society
+  const isAdmin = await isPlatformAdmin(userId);
+  if (isAdmin) return true;
+  
   const role = await getSocietyRole(userId, societyId);
   return role === "admin";
 }
 
 /**
  * Check if user is a moderator or admin of a society
+ * Platform admins are considered moderators of all societies
  */
 export async function isSocietyModerator(
   userId: string,
   societyId: string
 ): Promise<boolean> {
+  // Platform admins can moderate any society
+  const isAdmin = await isPlatformAdmin(userId);
+  if (isAdmin) return true;
+  
   const role = await getSocietyRole(userId, societyId);
   return role === "admin" || role === "moderator";
 }
