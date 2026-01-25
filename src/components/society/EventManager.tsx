@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -35,8 +35,26 @@ export function EventManager({ societyId, events }: EventManagerProps) {
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [optimisticEvents, setOptimisticEvents] = useState<Event[]>([]);
   const [deletedIds, setDeletedIds] = useState<string[]>([]);
+  const [isPending, startTransition] = useTransition();
+  const prevEventsRef = useRef<Event[]>(events);
   const router = useRouter();
   const supabase = createClient();
+
+  // Clear optimistic events when real events update (server data arrives)
+  useEffect(() => {
+    // Check if new events arrived from server
+    const prevIds = new Set(prevEventsRef.current.map(e => e.id));
+    const newRealEvents = events.filter(e => !prevIds.has(e.id));
+    
+    if (newRealEvents.length > 0 && optimisticEvents.length > 0) {
+      // New events from server, remove matching optimistic events
+      setOptimisticEvents(prev => 
+        prev.filter(opt => !newRealEvents.some(real => real.title === opt.title))
+      );
+    }
+    
+    prevEventsRef.current = events;
+  }, [events, optimisticEvents.length]);
 
   // Combine real events with optimistic ones, excluding deleted
   const displayEvents = [...optimisticEvents, ...events.filter(e => !deletedIds.includes(e.id))];
@@ -127,9 +145,10 @@ export function EventManager({ societyId, events }: EventManagerProps) {
         throw error;
       }
 
-      // Clear optimistic events after refresh brings real data
-      router.refresh();
-      setTimeout(() => setOptimisticEvents([]), 1000);
+      // Refresh to get the real event from server (use transition to avoid flash)
+      startTransition(() => {
+        router.refresh();
+      });
     } catch (error) {
       console.error("Error creating event:", error);
     } finally {
@@ -154,7 +173,9 @@ export function EventManager({ societyId, events }: EventManagerProps) {
         setDeletedIds(prev => prev.filter(id => id !== eventId));
         throw error;
       }
-      router.refresh();
+      startTransition(() => {
+        router.refresh();
+      });
     } catch (error) {
       console.error("Error deleting event:", error);
     }

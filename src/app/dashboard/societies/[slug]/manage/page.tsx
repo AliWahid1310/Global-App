@@ -118,9 +118,9 @@ export default async function ManageSocietyPage({ params }: Props) {
           <div>
             <Link
               href="/dashboard"
-              className="inline-flex items-center text-dark-300 hover:text-white transition-colors mb-2 group"
+              className="inline-flex items-center gap-2 px-4 py-2 glass rounded-xl text-white hover:bg-white/10 transition-all mb-4 group"
             >
-              <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+              <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
               Back to Dashboard
             </Link>
             <div className="flex items-center gap-3">
@@ -134,7 +134,7 @@ export default async function ManageSocietyPage({ params }: Props) {
           </div>
           <Link
             href={`/societies/${slug}`}
-            className="inline-flex items-center gap-2 text-accent-400 hover:text-accent-300 font-medium transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2.5 glass rounded-xl text-accent-400 hover:text-accent-300 hover:bg-accent-500/10 font-medium transition-all"
           >
             View Public Page
             <ExternalLink className="h-4 w-4" />
