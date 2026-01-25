@@ -14,7 +14,7 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/dashboard";
+  const redirect = searchParams.get("redirect") || "/feed";
   const supabase = createClient();
 
   const handleLogin = async (e: React.FormEvent) => {

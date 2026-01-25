@@ -430,3 +430,42 @@ export type SocietyMemberWithProfile = SocietyMember & {
 export type ChatMessageWithUser = ChatMessage & {
   user: Profile | null;
 };
+
+// Feed types
+export type FeedItemType = 'event' | 'announcement';
+
+export interface BaseFeedItem {
+  id: string;
+  type: FeedItemType;
+  title: string;
+  description: string | null;
+  image_url: string | null;
+  society_id: string;
+  society_name: string;
+  society_slug: string;
+  society_logo: string | null;
+  created_at: string;
+}
+
+export interface EventFeedItem extends BaseFeedItem {
+  type: 'event';
+  start_time: string;
+  end_time: string | null;
+  location: string | null;
+  capacity: number | null;
+  rsvp_count: {
+    going: number;
+    maybe: number;
+    total_guests: number;
+  };
+  user_rsvp_status: RSVPStatus | null;
+}
+
+export interface AnnouncementFeedItem extends BaseFeedItem {
+  type: 'announcement';
+  author_name: string | null;
+  author_avatar: string | null;
+  is_pinned: boolean;
+}
+
+export type FeedItem = EventFeedItem | AnnouncementFeedItem;

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
-import { Menu, X, Users, LogOut, User as UserIcon, LayoutDashboard } from "lucide-react";
+import { Menu, X, Users, LogOut, User as UserIcon, LayoutDashboard, Sparkles } from "lucide-react";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -96,6 +96,13 @@ export function Navbar() {
             ) : user ? (
               <div className="flex items-center gap-2">
                 <Link
+                  href="/feed"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-dark-200 hover:text-white hover:bg-white/5 transition-all"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  <span className="text-sm font-medium">Feed</span>
+                </Link>
+                <Link
                   href="/dashboard"
                   className="flex items-center gap-2 px-4 py-2 rounded-xl text-dark-200 hover:text-white hover:bg-white/5 transition-all"
                 >
@@ -167,6 +174,14 @@ export function Navbar() {
             
             {user ? (
               <>
+                <Link
+                  href="/feed"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-dark-200 hover:text-white hover:bg-white/5"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Sparkles className="h-5 w-5" />
+                  Feed
+                </Link>
                 <Link
                   href="/dashboard"
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-dark-200 hover:text-white hover:bg-white/5"
