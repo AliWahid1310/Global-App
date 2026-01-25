@@ -288,10 +288,10 @@ export function EventManager({ societyId, events }: EventManagerProps) {
 
               {showAdvanced && (
                 <div className="mt-4 space-y-4 p-4 bg-dark-900/50 rounded-xl">
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-3 items-end">
                     <div>
                       <label className="block text-sm font-medium text-dark-200 mb-1.5">
-                        Capacity (optional)
+                        Capacity
                       </label>
                       <input
                         type="number"
