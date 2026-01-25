@@ -233,7 +233,7 @@ function EventHorizontalCard({ item }: { item: EventFeedItem }) {
   };
 
   return (
-    <div className="group relative bg-dark-900/60 backdrop-blur-sm border border-dark-700/50 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10 hover:-translate-y-1">
+    <div className="group relative bg-dark-900/60 backdrop-blur-sm border border-dark-700/50 rounded-2xl overflow-hidden hover:border-purple-500/40 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10 hover:-translate-y-1">
       {/* Image */}
       <div className="relative h-40 overflow-hidden">
         {item.image_url ? (
