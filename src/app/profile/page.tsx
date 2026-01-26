@@ -148,24 +148,11 @@ export default function ProfilePage() {
               <div className="flex items-center gap-4 sm:gap-6">
                 <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-dark-700 flex items-center justify-center ring-4 ring-dark-600 flex-shrink-0">
                   {(avatarPreview || (!avatarRemoved && profile?.avatar_url)) ? (
-                    <>
-                      <img
-                        src={avatarPreview || profile?.avatar_url || ""}
-                        alt={profile?.full_name || "Profile"}
-                        className="w-full h-full object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAvatarFile(null);
-                          setAvatarPreview(null);
-                          setAvatarRemoved(true);
-                        }}
-                        className="absolute top-1 right-1 p-1 bg-dark-900/80 rounded-full text-white hover:bg-dark-900 transition-all"
-                      >
-                        <X className="h-3 w-3 sm:h-4 sm:w-4" />
-                      </button>
-                    </>
+                    <img
+                      src={avatarPreview || profile?.avatar_url || ""}
+                      alt={profile?.full_name || "Profile"}
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <User className="h-10 w-10 sm:h-12 sm:w-12 text-dark-400" />
                   )}
@@ -190,6 +177,7 @@ export default function ProfilePage() {
                     }}
                     aspectRatio="square"
                     placeholder="Upload new photo"
+                    currentImage={avatarPreview || (!avatarRemoved ? profile?.avatar_url : undefined) || undefined}
                   />
                 </div>
               </div>
