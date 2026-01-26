@@ -133,41 +133,37 @@ export function HeroSection() {
               
               {/* Scrolling content */}
               <div className="relative overflow-hidden">
-                <div className="flex animate-university-scroll gap-6 items-center">
+                <div className="flex animate-university-scroll gap-8 items-center">
                   {[
-                    { name: "Air University", short: "AU" },
-                    { name: "NUST", short: "NUST" },
-                    { name: "FAST-NUCES", short: "FAST" },
-                    { name: "COMSATS", short: "CUI" },
-                    { name: "LUMS", short: "LUMS" },
-                    { name: "IBA Karachi", short: "IBA" },
-                    { name: "GIKI", short: "GIKI" },
-                    { name: "PIEAS", short: "PIEAS" },
-                    { name: "UET Lahore", short: "UET" },
-                    { name: "SZABIST", short: "SZAB" },
-                    { name: "NUST", short: "NUST" },
-                    { name: "Air University", short: "AU" },
-                    { name: "FAST-NUCES", short: "FAST" },
-                    { name: "COMSATS", short: "CUI" },
-                    { name: "LUMS", short: "LUMS" },
-                    { name: "IBA Karachi", short: "IBA" },
-                    { name: "GIKI", short: "GIKI" },
-                    { name: "PIEAS", short: "PIEAS" },
-                    { name: "UET Lahore", short: "UET" },
-                    { name: "SZABIST", short: "SZAB" },
+                    "Air University",
+                    "NUST",
+                    "FAST-NUCES",
+                    "COMSATS",
+                    "LUMS",
+                    "IBA Karachi",
+                    "GIKI",
+                    "PIEAS",
+                    "UET Lahore",
+                    "SZABIST",
+                    "Air University",
+                    "NUST",
+                    "FAST-NUCES",
+                    "COMSATS",
+                    "LUMS",
+                    "IBA Karachi",
+                    "GIKI",
+                    "PIEAS",
+                    "UET Lahore",
+                    "SZABIST",
                   ].map((uni, i) => (
                     <div 
                       key={i} 
                       className="flex-shrink-0 group cursor-default"
                     >
-                      <div className="flex items-center gap-4 px-6 py-4 rounded-xl bg-white/[0.04] border border-white/[0.06] hover:bg-white/[0.08] hover:border-white/[0.12] hover:scale-105 hover:shadow-lg hover:shadow-accent-500/10 transition-all duration-300">
-                        {/* University icon */}
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent-500/20 to-purple-500/20 border border-white/[0.08] flex items-center justify-center group-hover:from-accent-500/30 group-hover:to-purple-500/30 transition-all duration-300">
-                          <span className="text-white/90 font-bold text-sm">{uni.short}</span>
-                        </div>
-                        {/* University name */}
-                        <span className="text-white/80 text-base font-semibold whitespace-nowrap group-hover:text-white transition-colors duration-300">
-                          {uni.name}
+                      <div className="flex items-center gap-3 px-4 py-2.5 rounded-full bg-white/[0.03] border border-white/[0.06] hover:bg-accent-500/20 hover:border-accent-500/30 hover:scale-105 transition-all duration-300">
+                        <span className="text-lg group-hover:scale-110 transition-transform">🎓</span>
+                        <span className="text-dark-200 text-sm font-semibold whitespace-nowrap group-hover:text-accent-400 transition-colors duration-300">
+                          {uni}
                         </span>
                       </div>
                     </div>
