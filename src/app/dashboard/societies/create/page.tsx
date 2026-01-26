@@ -7,6 +7,7 @@ import { canCreateSocietyClient } from "@/lib/auth/roles.client";
 import { uploadToCloudinary } from "@/lib/cloudinary/upload";
 import { addCreatorAsAdmin } from "@/lib/actions/membership";
 import { ImageUpload } from "@/components/ui/ImageUpload";
+import { getUserFriendlyError } from "@/lib/utils/errors";
 import { Loader2, ArrowLeft, Sparkles, Clock, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import type { SocietyStatus } from "@/types/database";
@@ -142,7 +143,7 @@ export default function CreateSocietyPage() {
         router.refresh();
       }
     } catch (err: any) {
-      setError(err.message || "Failed to create society");
+      setError(getUserFriendlyError(err));
     } finally {
       setLoading(false);
     }

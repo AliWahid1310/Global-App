@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { getUserFriendlyError } from "@/lib/utils/errors";
 import { Mail, Loader2, Users, ArrowLeft, Check } from "lucide-react";
 
 export default function ForgotPasswordPage() {
@@ -23,12 +24,12 @@ export default function ForgotPasswordPage() {
       });
 
       if (error) {
-        setError(error.message);
+        setError(getUserFriendlyError(error));
       } else {
         setSuccess(true);
       }
-    } catch {
-      setError("An unexpected error occurred");
+    } catch (err) {
+      setError(getUserFriendlyError(err));
     } finally {
       setLoading(false);
     }

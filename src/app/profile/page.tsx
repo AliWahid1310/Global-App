@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { uploadToCloudinary } from "@/lib/cloudinary/upload";
+import { getUserFriendlyError } from "@/lib/utils/errors";
 import { ImageUpload } from "@/components/ui/ImageUpload";
 import type { Profile } from "@/types/database";
 import { User, Mail, Building, Loader2, ArrowLeft, Save, Shield } from "lucide-react";
@@ -82,10 +83,10 @@ export default function ProfilePage() {
       setProfile({ ...profile, full_name: fullName, university, avatar_url: avatarUrl });
       setMessage({ type: "success", text: "Profile updated successfully!" });
       router.refresh();
-    } catch (error: any) {
+    } catch (error) {
       setMessage({
         type: "error",
-        text: error.message || "Failed to update profile",
+        text: getUserFriendlyError(error),
       });
     } finally {
       setSaving(false);

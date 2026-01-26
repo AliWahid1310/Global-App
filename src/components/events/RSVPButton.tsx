@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { rsvpToEvent, cancelRSVP } from "@/lib/actions/events";
+import { getUserFriendlyError } from "@/lib/utils/errors";
 import type { RSVPStatus, EventRSVP, Event } from "@/types/database";
 import {
   Check,
@@ -109,7 +110,7 @@ export function RSVPButton({
         // Revert on error
         setOptimisticRSVP(previousRSVP);
         setOptimisticCount(previousCount);
-        setError(result.error);
+        setError(getUserFriendlyError(result.error));
         console.error("RSVP error:", result.error);
       } else {
         // Background refresh to sync with server
@@ -119,7 +120,7 @@ export function RSVPButton({
       // Revert on error
       setOptimisticRSVP(previousRSVP);
       setOptimisticCount(previousCount);
-      setError("Failed to RSVP. Please try again.");
+      setError(getUserFriendlyError(err));
       console.error("RSVP failed:", err);
     } finally {
       setLoading(null);
@@ -153,7 +154,7 @@ export function RSVPButton({
         // Revert on error
         setOptimisticRSVP(previousRSVP);
         setOptimisticCount(previousCount);
-        setError(result.error);
+        setError(getUserFriendlyError(result.error));
       } else {
         router.refresh();
       }
@@ -161,7 +162,7 @@ export function RSVPButton({
       // Revert on error
       setOptimisticRSVP(previousRSVP);
       setOptimisticCount(previousCount);
-      setError("Failed to cancel RSVP. Please try again.");
+      setError(getUserFriendlyError(err));
       console.error("Cancel RSVP failed:", err);
     } finally {
       setLoading(null);

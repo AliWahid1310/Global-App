@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { approveMember, rejectMember, removeMember, updateMemberRole } from "@/lib/actions/membership";
+import { getUserFriendlyError } from "@/lib/utils/errors";
 import type { SocietyMember, Profile } from "@/types/database";
 import {
   Check,
@@ -52,7 +53,7 @@ export function MembershipManager({
         // Revert on error
         setHiddenIds(prev => prev.filter(id => id !== memberId));
         setOptimisticApproved(prev => prev.filter(id => id !== memberId));
-        setError(result.error);
+        setError(getUserFriendlyError(result.error));
       } else {
         router.refresh();
       }
@@ -60,7 +61,7 @@ export function MembershipManager({
       console.error("Error approving member:", err);
       setHiddenIds(prev => prev.filter(id => id !== memberId));
       setOptimisticApproved(prev => prev.filter(id => id !== memberId));
-      setError("Failed to approve member");
+      setError(getUserFriendlyError(err));
     } finally {
       setLoadingId(null);
     }
@@ -78,14 +79,14 @@ export function MembershipManager({
       if (result.error) {
         // Revert on error
         setHiddenIds(prev => prev.filter(id => id !== memberId));
-        setError(result.error);
+        setError(getUserFriendlyError(result.error));
       } else {
         router.refresh();
       }
     } catch (err) {
       console.error("Error rejecting member:", err);
       setHiddenIds(prev => prev.filter(id => id !== memberId));
-      setError("Failed to reject member");
+      setError(getUserFriendlyError(err));
     } finally {
       setLoadingId(null);
     }
@@ -105,14 +106,14 @@ export function MembershipManager({
       if (result.error) {
         // Revert on error
         setHiddenIds(prev => prev.filter(id => id !== memberId));
-        setError(result.error);
+        setError(getUserFriendlyError(result.error));
       } else {
         router.refresh();
       }
     } catch (err) {
       console.error("Error removing member:", err);
       setHiddenIds(prev => prev.filter(id => id !== memberId));
-      setError("Failed to remove member");
+      setError(getUserFriendlyError(err));
     } finally {
       setLoadingId(null);
     }
@@ -134,7 +135,7 @@ export function MembershipManager({
           delete updated[memberId];
           return updated;
         });
-        setError(result.error);
+        setError(getUserFriendlyError(result.error));
       } else {
         router.refresh();
       }
@@ -145,7 +146,7 @@ export function MembershipManager({
         delete updated[memberId];
         return updated;
       });
-      setError("Failed to update role");
+      setError(getUserFriendlyError(err));
     } finally {
       setLoadingId(null);
     }

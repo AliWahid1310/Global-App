@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getUserFriendlyError } from "@/lib/utils/errors";
 import { Lock, Loader2, Users, ArrowRight, Check, Eye, EyeOff } from "lucide-react";
 
 export default function ResetPasswordPage() {
@@ -60,7 +61,7 @@ export default function ResetPasswordPage() {
       });
 
       if (error) {
-        setError(error.message);
+        setError(getUserFriendlyError(error));
       } else {
         setSuccess(true);
         // Redirect to login after 3 seconds
@@ -68,8 +69,8 @@ export default function ResetPasswordPage() {
           router.push("/login");
         }, 3000);
       }
-    } catch {
-      setError("An unexpected error occurred");
+    } catch (err) {
+      setError(getUserFriendlyError(err));
     } finally {
       setLoading(false);
     }

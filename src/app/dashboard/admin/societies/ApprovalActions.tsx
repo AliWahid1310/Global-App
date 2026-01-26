@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { approveSociety, rejectSociety } from "./actions";
+import { getUserFriendlyError } from "@/lib/utils/errors";
 import { Check, X, Loader2 } from "lucide-react";
 
 interface ApprovalActionsProps {
@@ -25,12 +26,12 @@ export function ApprovalActions({ societyId, societyName }: ApprovalActionsProps
         : await rejectSociety(societyId);
 
       if (result.error) {
-        setError(result.error);
+        setError(getUserFriendlyError(result.error));
       } else {
         router.refresh();
       }
-    } catch (err: any) {
-      setError(err.message || `Failed to ${action} society`);
+    } catch (err) {
+      setError(getUserFriendlyError(err));
     } finally {
       setLoading(null);
     }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { joinSociety, leaveSociety } from "@/lib/actions/membership";
+import { getUserFriendlyError } from "@/lib/utils/errors";
 import type { SocietyMember } from "@/types/database";
 import { Loader2, UserPlus, Check, Clock, X, Sparkles, AlertTriangle } from "lucide-react";
 
@@ -75,7 +76,7 @@ export function JoinButton({ societyId, userId, membership }: JoinButtonProps) {
       const result = await joinSociety(societyId);
       
       if (result.error) {
-        setError(result.error);
+        setError(getUserFriendlyError(result.error));
         setLoading(false);
       } else {
         setOptimisticState("pending");
@@ -84,7 +85,7 @@ export function JoinButton({ societyId, userId, membership }: JoinButtonProps) {
       }
     } catch (err) {
       console.error("Error joining society:", err);
-      setError("Failed to join society");
+      setError(getUserFriendlyError(err));
       setLoading(false);
     }
   };
@@ -100,7 +101,7 @@ export function JoinButton({ societyId, userId, membership }: JoinButtonProps) {
       const result = await leaveSociety(societyId);
       
       if (result.error) {
-        setError(result.error);
+        setError(getUserFriendlyError(result.error));
         setLoading(false);
       } else {
         setOptimisticState("left");
@@ -109,7 +110,7 @@ export function JoinButton({ societyId, userId, membership }: JoinButtonProps) {
       }
     } catch (err) {
       console.error("Error leaving society:", err);
-      setError("Failed to leave society");
+      setError(getUserFriendlyError(err));
       setLoading(false);
     }
   };

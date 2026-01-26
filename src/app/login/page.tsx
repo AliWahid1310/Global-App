@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getUserFriendlyError } from "@/lib/utils/errors";
 import { Mail, Lock, Loader2, Users, ArrowRight, Eye, EyeOff } from "lucide-react";
 
 function LoginForm() {
@@ -29,13 +30,13 @@ function LoginForm() {
       });
 
       if (error) {
-        setError(error.message);
+        setError(getUserFriendlyError(error));
       } else {
         router.push(redirect);
         router.refresh();
       }
-    } catch {
-      setError("An unexpected error occurred");
+    } catch (err) {
+      setError(getUserFriendlyError(err));
     } finally {
       setLoading(false);
     }

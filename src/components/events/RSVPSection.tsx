@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { rsvpToEvent, cancelRSVP } from "@/lib/actions/events";
+import { getUserFriendlyError } from "@/lib/utils/errors";
 import type { RSVPStatus, EventRSVP, Event } from "@/types/database";
 import { format } from "date-fns";
 import {
@@ -102,14 +103,14 @@ export function RSVPSection({
       if (result.error) {
         setCurrentRSVP(previousRSVP);
         setCounts(previousCounts);
-        setError(result.error);
+        setError(getUserFriendlyError(result.error));
       } else {
         router.refresh();
       }
     } catch (err) {
       setCurrentRSVP(previousRSVP);
       setCounts(previousCounts);
-      setError("Failed to RSVP. Please try again.");
+      setError(getUserFriendlyError(err));
     } finally {
       setLoading(null);
       setPendingStatus(null);
@@ -140,14 +141,14 @@ export function RSVPSection({
       if (result.error) {
         setCurrentRSVP(previousRSVP);
         setCounts(previousCounts);
-        setError(result.error);
+        setError(getUserFriendlyError(result.error));
       } else {
         router.refresh();
       }
     } catch (err) {
       setCurrentRSVP(previousRSVP);
       setCounts(previousCounts);
-      setError("Failed to cancel RSVP. Please try again.");
+      setError(getUserFriendlyError(err));
     } finally {
       setLoading(null);
     }
