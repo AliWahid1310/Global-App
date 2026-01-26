@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Upload, X } from "lucide-react";
 
 interface ImageUploadProps {
   onFileSelect: (file: File | null) => void;
+  onRemove?: () => void;
   aspectRatio?: "square" | "banner";
   placeholder?: string;
   currentImage?: string;
@@ -13,6 +14,7 @@ interface ImageUploadProps {
 
 export function ImageUpload({
   onFileSelect,
+  onRemove,
   aspectRatio = "square",
   placeholder = "Upload image",
   currentImage,
@@ -20,6 +22,11 @@ export function ImageUpload({
   const [preview, setPreview] = useState<string | null>(currentImage || null);
   const [dragActive, setDragActive] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Sync preview with currentImage prop changes
+  useEffect(() => {
+    setPreview(currentImage || null);
+  }, [currentImage]);
 
   const handleFile = (file: File | null) => {
     if (file) {
@@ -72,7 +79,9 @@ export function ImageUpload({
   };
 
   const clearImage = () => {
-    handleFile(null);
+    setPreview(null);
+    onFileSelect(null);
+    onRemove?.();
     if (inputRef.current) {
       inputRef.current.value = "";
     }
@@ -117,18 +126,19 @@ export function ImageUpload({
             type="button"
             onClick={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               clearImage();
             }}
-            className="absolute top-2 right-2 p-1.5 bg-dark-900/80 rounded-full text-white hover:bg-dark-900 transition-all"
+            className="absolute top-2 right-2 p-1.5 bg-dark-900/80 rounded-full text-white hover:bg-dark-900 transition-all z-10"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center h-full text-dark-400 cursor-pointer">
-          <Upload className="h-8 w-8 mb-2" />
-          <span className="text-sm text-dark-300">{placeholder}</span>
-          <span className="text-xs text-dark-500 mt-1">
+        <div className="flex flex-col items-center justify-center h-full w-full text-dark-400 cursor-pointer px-4 py-4">
+          <Upload className="h-6 w-6 sm:h-8 sm:w-8 mb-2 flex-shrink-0" />
+          <span className="text-sm text-dark-300 text-center">{placeholder}</span>
+          <span className="text-xs text-dark-500 mt-1 text-center">
             Drag & drop or click to browse
           </span>
         </div>

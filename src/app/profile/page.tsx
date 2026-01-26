@@ -7,7 +7,7 @@ import { uploadToCloudinary } from "@/lib/cloudinary/upload";
 import { getUserFriendlyError } from "@/lib/utils/errors";
 import { ImageUpload } from "@/components/ui/ImageUpload";
 import type { Profile } from "@/types/database";
-import { User, Mail, Building, Loader2, ArrowLeft, Save, Shield } from "lucide-react";
+import { User, Mail, Building, Loader2, ArrowLeft, Save, Shield, X } from "lucide-react";
 import Link from "next/link";
 
 export default function ProfilePage() {
@@ -15,6 +15,8 @@ export default function ProfilePage() {
   const [fullName, setFullName] = useState("");
   const [university, setUniversity] = useState("");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarRemoved, setAvatarRemoved] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{
@@ -64,7 +66,9 @@ export default function ProfilePage() {
     try {
       let avatarUrl = profile.avatar_url;
 
-      if (avatarFile) {
+      if (avatarRemoved) {
+        avatarUrl = null;
+      } else if (avatarFile) {
         const result = await uploadToCloudinary(avatarFile, "avatars");
         avatarUrl = result.secure_url;
       }
@@ -81,6 +85,9 @@ export default function ProfilePage() {
       if (error) throw error;
 
       setProfile({ ...profile, full_name: fullName, university, avatar_url: avatarUrl });
+      setAvatarRemoved(false);
+      setAvatarPreview(null);
+      setAvatarFile(null);
       setMessage({ type: "success", text: "Profile updated successfully!" });
       router.refresh();
     } catch (error) {
@@ -138,24 +145,51 @@ export default function ProfilePage() {
               <label className="block text-sm font-medium text-dark-100 mb-3">
                 Profile Picture
               </label>
-              <div className="flex items-center gap-6">
-                <div className="w-24 h-24 rounded-2xl overflow-hidden bg-dark-700 flex items-center justify-center ring-4 ring-dark-600">
-                  {profile?.avatar_url ? (
-                    <img
-                      src={profile.avatar_url}
-                      alt={profile.full_name || "Profile"}
-                      className="w-full h-full object-cover"
-                    />
+              <div className="flex items-center gap-4 sm:gap-6">
+                <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-dark-700 flex items-center justify-center ring-4 ring-dark-600 flex-shrink-0">
+                  {(avatarPreview || (!avatarRemoved && profile?.avatar_url)) ? (
+                    <>
+                      <img
+                        src={avatarPreview || profile?.avatar_url || ""}
+                        alt={profile?.full_name || "Profile"}
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAvatarFile(null);
+                          setAvatarPreview(null);
+                          setAvatarRemoved(true);
+                        }}
+                        className="absolute top-1 right-1 p-1 bg-dark-900/80 rounded-full text-white hover:bg-dark-900 transition-all"
+                      >
+                        <X className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </button>
+                    </>
                   ) : (
-                    <User className="h-12 w-12 text-dark-400" />
+                    <User className="h-10 w-10 sm:h-12 sm:w-12 text-dark-400" />
                   )}
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <ImageUpload
-                    onFileSelect={setAvatarFile}
+                    onFileSelect={(file) => {
+                      setAvatarFile(file);
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setAvatarPreview(reader.result as string);
+                          setAvatarRemoved(false);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    onRemove={() => {
+                      setAvatarFile(null);
+                      setAvatarPreview(null);
+                      setAvatarRemoved(true);
+                    }}
                     aspectRatio="square"
                     placeholder="Upload new photo"
-                    currentImage={profile?.avatar_url || undefined}
                   />
                 </div>
               </div>
