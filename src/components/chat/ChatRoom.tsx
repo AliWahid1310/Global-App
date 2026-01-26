@@ -224,7 +224,7 @@ export function ChatRoom({
           <button
             type="submit"
             disabled={!newMessage.trim() || sending}
-            className="px-5 py-3 bg-accent-500 text-white rounded-full hover:bg-accent-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all btn-glow"
+            className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-accent-500 text-white rounded-full hover:bg-accent-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all btn-glow"
           >
             <Send className="h-5 w-5" />
           </button>

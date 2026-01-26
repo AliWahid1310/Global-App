@@ -138,7 +138,7 @@ export function JoinButton({ societyId, userId, membership }: JoinButtonProps) {
       <div className="flex flex-col gap-2">
         <button
           onClick={handleJoin}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-accent-500 text-white font-semibold rounded-xl hover:bg-accent-600 transition-all btn-glow group"
+          className="inline-flex items-center justify-center gap-2 w-fit px-6 py-3 bg-accent-500 text-white font-semibold rounded-xl hover:bg-accent-600 transition-all btn-glow group"
         >
           <Sparkles className="h-4 w-4 group-hover:animate-pulse" />
           Join the Circle
@@ -167,7 +167,7 @@ export function JoinButton({ societyId, userId, membership }: JoinButtonProps) {
       <div className="flex flex-col gap-2">
         <button
           onClick={handleJoin}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-accent-500 text-white font-semibold rounded-xl hover:bg-accent-600 transition-all btn-glow group"
+          className="inline-flex items-center justify-center gap-2 w-fit px-6 py-3 bg-accent-500 text-white font-semibold rounded-xl hover:bg-accent-600 transition-all btn-glow group"
         >
           <Sparkles className="h-4 w-4 group-hover:animate-pulse" />
           Join the Circle
