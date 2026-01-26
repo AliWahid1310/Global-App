@@ -106,12 +106,15 @@ export function HeroSection() {
             }`}
             style={{ transitionDelay: "400ms" }}
           >
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-white mb-4">
-              Trusted by{" "}
-              <span className="gradient-text">top universities</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-500/10 border border-accent-500/20 mb-6">
+              <span className="w-2 h-2 rounded-full bg-accent-400 animate-pulse" />
+              <span className="text-xs text-accent-300 font-medium uppercase tracking-wider">Campus Network</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-display font-semibold text-white mb-3">
+              Trusted by <span className="text-accent-400">top universities</span>
             </h2>
-            <p className="text-dark-300 text-lg max-w-xl mx-auto">
-              Empowering students across campuses to connect, collaborate, and create
+            <p className="text-dark-400 text-base max-w-md mx-auto">
+              Empowering students across campuses
             </p>
           </div>
           
