@@ -19,6 +19,7 @@ export default function CreateSocietyPage() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState<string>("");
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -75,17 +76,35 @@ export default function CreateSocietyPage() {
       let logoUrl: string | null = null;
       let bannerUrl: string | null = null;
 
-      // Upload images to Cloudinary
+      // Upload images to Cloudinary in parallel for faster upload
+      const uploadPromises: Promise<any>[] = [];
+      
+      if (logoFile || bannerFile) {
+        setLoadingStatus("Uploading images...");
+      }
+      
       if (logoFile) {
-        const result = await uploadToCloudinary(logoFile, "societies/logos");
-        logoUrl = result.secure_url;
+        uploadPromises.push(
+          uploadToCloudinary(logoFile, "societies/logos").then(result => {
+            logoUrl = result.secure_url;
+          })
+        );
       }
 
       if (bannerFile) {
-        const result = await uploadToCloudinary(bannerFile, "societies/banners");
-        bannerUrl = result.secure_url;
+        uploadPromises.push(
+          uploadToCloudinary(bannerFile, "societies/banners").then(result => {
+            bannerUrl = result.secure_url;
+          })
+        );
       }
 
+      // Wait for all uploads to complete in parallel
+      if (uploadPromises.length > 0) {
+        await Promise.all(uploadPromises);
+      }
+
+      setLoadingStatus("Creating society...");
       const slug = generateSlug(name);
 
       // Create society with appropriate status
@@ -351,7 +370,7 @@ export default function CreateSocietyPage() {
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    {isPlatformAdmin ? "Creating..." : "Submitting..."}
+                    {loadingStatus || (isPlatformAdmin ? "Creating..." : "Submitting...")}
                   </>
                 ) : (
                   isPlatformAdmin ? "Create Society" : "Submit Request"
