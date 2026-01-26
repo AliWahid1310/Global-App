@@ -92,80 +92,95 @@ export function HeroSection() {
         </div>
       </section>
 
-      {/* Trusted By Section - Universities */}
-      <section className="relative py-24 mt-12 bg-dark-950 overflow-hidden">
-        {/* Ambient glow effects */}
-        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-96 h-96 bg-accent-500/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 right-0 -translate-y-1/2 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
+      {/* Trusted Universities Section - Premium Design */}
+      <section className="relative py-32 bg-dark-950 overflow-hidden">
+        {/* Background gradient effects */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent-500/[0.02] to-transparent" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-accent-500/[0.03] rounded-full blur-3xl" />
         
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
-          {/* Header with animation */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6">
+          {/* Header */}
           <div 
-            className={`text-center mb-12 transition-all duration-700 ${
-              mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            className={`text-center mb-16 transition-all duration-1000 ${
+              mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
             style={{ transitionDelay: "400ms" }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-4">
-              <span className="w-2 h-2 rounded-full bg-accent-400 animate-pulse" />
-              <span className="text-xs text-accent-300 font-medium uppercase tracking-wider">Trusted Platform</span>
-            </div>
-            <p className="text-dark-300 text-lg">
-              Empowering students across <span className="text-white font-semibold">top universities</span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-white mb-4">
+              Trusted by{" "}
+              <span className="gradient-text">top universities</span>
+            </h2>
+            <p className="text-dark-300 text-lg max-w-xl mx-auto">
+              Empowering students across campuses to connect, collaborate, and create
             </p>
           </div>
           
-          {/* University marquee with glass effect */}
+          {/* Glass container for marquee */}
           <div 
-            className={`relative transition-all duration-700 ${
-              mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            className={`relative transition-all duration-1000 ${
+              mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
-            style={{ transitionDelay: "500ms" }}
+            style={{ transitionDelay: "600ms" }}
           >
-            {/* Fade edges */}
-            <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-dark-950 to-transparent z-10" />
-            <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-dark-950 to-transparent z-10" />
-            
-            <div className="glass rounded-2xl py-6 px-4 overflow-hidden">
-              <div className="flex animate-scroll gap-16 items-center">
-                {[
-                  "Air University",
-                  "NUST",
-                  "FAST-NUCES",
-                  "COMSATS",
-                  "LUMS",
-                  "IBA Karachi",
-                  "GIKI",
-                  "PIEAS",
-                  "UET Lahore",
-                  "SZABIST",
-                  "Air University",
-                  "NUST",
-                  "FAST-NUCES",
-                  "COMSATS",
-                  "LUMS",
-                  "IBA Karachi",
-                ].map((uni, i) => (
-                  <div 
-                    key={i} 
-                    className="flex items-center gap-3 whitespace-nowrap group cursor-default"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-dark-700/50 flex items-center justify-center group-hover:bg-accent-500/20 transition-colors">
-                      <span className="text-xl">🎓</span>
+            {/* Main glass card */}
+            <div className="relative rounded-2xl bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] shadow-2xl shadow-black/20 p-8 md:p-10 overflow-hidden">
+              {/* Inner glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-accent-500/[0.03] via-transparent to-purple-500/[0.03]" />
+              
+              {/* Fade edges */}
+              <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-r from-dark-950/90 via-dark-950/50 to-transparent z-20 pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-l from-dark-950/90 via-dark-950/50 to-transparent z-20 pointer-events-none" />
+              
+              {/* Scrolling content */}
+              <div className="relative overflow-hidden">
+                <div className="flex animate-university-scroll gap-6 items-center">
+                  {[
+                    { name: "Air University", short: "AU" },
+                    { name: "NUST", short: "NUST" },
+                    { name: "FAST-NUCES", short: "FAST" },
+                    { name: "COMSATS", short: "CUI" },
+                    { name: "LUMS", short: "LUMS" },
+                    { name: "IBA Karachi", short: "IBA" },
+                    { name: "GIKI", short: "GIKI" },
+                    { name: "PIEAS", short: "PIEAS" },
+                    { name: "UET Lahore", short: "UET" },
+                    { name: "SZABIST", short: "SZAB" },
+                    { name: "NUST", short: "NUST" },
+                    { name: "Air University", short: "AU" },
+                    { name: "FAST-NUCES", short: "FAST" },
+                    { name: "COMSATS", short: "CUI" },
+                    { name: "LUMS", short: "LUMS" },
+                    { name: "IBA Karachi", short: "IBA" },
+                    { name: "GIKI", short: "GIKI" },
+                    { name: "PIEAS", short: "PIEAS" },
+                    { name: "UET Lahore", short: "UET" },
+                    { name: "SZABIST", short: "SZAB" },
+                  ].map((uni, i) => (
+                    <div 
+                      key={i} 
+                      className="flex-shrink-0 group cursor-default"
+                    >
+                      <div className="flex items-center gap-4 px-6 py-4 rounded-xl bg-white/[0.04] border border-white/[0.06] hover:bg-white/[0.08] hover:border-white/[0.12] hover:scale-105 hover:shadow-lg hover:shadow-accent-500/10 transition-all duration-300">
+                        {/* University icon */}
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent-500/20 to-purple-500/20 border border-white/[0.08] flex items-center justify-center group-hover:from-accent-500/30 group-hover:to-purple-500/30 transition-all duration-300">
+                          <span className="text-white/90 font-bold text-sm">{uni.short}</span>
+                        </div>
+                        {/* University name */}
+                        <span className="text-white/80 text-base font-semibold whitespace-nowrap group-hover:text-white transition-colors duration-300">
+                          {uni.name}
+                        </span>
+                      </div>
                     </div>
-                    <span className="text-dark-200 text-base font-semibold group-hover:text-accent-400 transition-colors">
-                      {uni}
-                    </span>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
         
-        {/* Add CSS for scroll animation */}
+        {/* CSS for smooth marquee animation */}
         <style jsx>{`
-          @keyframes scroll {
+          @keyframes universityScroll {
             0% {
               transform: translateX(0);
             }
@@ -173,10 +188,11 @@ export function HeroSection() {
               transform: translateX(-50%);
             }
           }
-          .animate-scroll {
-            animation: scroll 30s linear infinite;
+          .animate-university-scroll {
+            animation: universityScroll 25s linear infinite;
+            will-change: transform;
           }
-          .animate-scroll:hover {
+          .animate-university-scroll:hover {
             animation-play-state: paused;
           }
         `}</style>
