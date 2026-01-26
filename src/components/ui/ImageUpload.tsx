@@ -80,6 +80,10 @@ export function ImageUpload({
 
   const heightClass = aspectRatio === "banner" ? "h-32" : "h-40";
 
+  const handleClick = () => {
+    inputRef.current?.click();
+  };
+
   return (
     <div
       className={`relative ${heightClass} border-2 border-dashed rounded-xl transition-all ${
@@ -91,13 +95,14 @@ export function ImageUpload({
       onDragLeave={handleDrag}
       onDragOver={handleDrag}
       onDrop={handleDrop}
+      onClick={!preview ? handleClick : undefined}
     >
       <input
         ref={inputRef}
         type="file"
         accept="image/*"
         onChange={handleChange}
-        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+        className="hidden"
       />
 
       {preview ? (
@@ -120,7 +125,7 @@ export function ImageUpload({
           </button>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center h-full text-dark-400">
+        <div className="flex flex-col items-center justify-center h-full text-dark-400 cursor-pointer">
           <Upload className="h-8 w-8 mb-2" />
           <span className="text-sm text-dark-300">{placeholder}</span>
           <span className="text-xs text-dark-500 mt-1">

@@ -336,17 +336,17 @@ export default function CreateSocietyPage() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-4 pt-4">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 pt-4">
               <Link
                 href="/dashboard"
-                className="px-6 py-3 border border-dark-600 text-dark-200 rounded-xl hover:bg-dark-800 transition-all"
+                className="w-full sm:w-auto px-6 py-3 border border-dark-600 text-dark-200 rounded-xl hover:bg-dark-800 transition-all text-center"
               >
                 Cancel
               </Link>
               <button
                 type="submit"
                 disabled={loading || !name}
-                className="px-6 py-3 bg-accent-500 text-white font-semibold rounded-xl hover:bg-accent-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center btn-glow"
+                className="w-full sm:w-auto px-6 py-3 bg-accent-500 text-white font-semibold rounded-xl hover:bg-accent-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center btn-glow"
               >
                 {loading ? (
                   <>
