@@ -25,7 +25,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -38,6 +38,9 @@ export default function RegisterPage() {
 
       if (error) {
         setError(getUserFriendlyError(error));
+      } else if (data?.user?.identities?.length === 0) {
+        // User already exists - Supabase returns empty identities array for existing users
+        setError("An account with this email already exists. Please sign in instead.");
       } else {
         setSuccess(true);
       }
