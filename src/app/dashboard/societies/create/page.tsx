@@ -353,7 +353,7 @@ export default function CreateSocietyPage() {
                     placeholder="e.g., +92 300 1234567"
                   />
                 </div>
-                <p className="mt-2 text-xs text-accent-400 font-medium bg-accent-500/10 border border-accent-500/20 rounded-lg px-3 py-2">
+                <p className="mt-2 text-xs text-accent-400 font-medium">
                   💡 We may contact you to verify your request and ensure legitimacy. Your number won&apos;t be shared publicly.
                 </p>
               </div>
