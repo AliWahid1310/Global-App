@@ -140,13 +140,13 @@ export function HeroSection({ isLoggedIn = false }: HeroSectionProps) {
             style={{ transitionDelay: "600ms" }}
           >
             {/* Main glass card */}
-            <div className="relative rounded-2xl bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] shadow-2xl shadow-black/20 p-4 sm:p-8 md:p-10 overflow-hidden">
+            <div className="relative rounded-2xl bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] shadow-2xl shadow-black/20 p-8 md:p-10 overflow-hidden">
               {/* Inner glow effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-accent-500/[0.03] via-transparent to-purple-500/[0.03]" />
               
               {/* Fade edges */}
-              <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-24 md:w-40 bg-gradient-to-r from-dark-950/90 via-dark-950/50 to-transparent z-20 pointer-events-none" />
-              <div className="absolute right-0 top-0 bottom-0 w-8 sm:w-24 md:w-40 bg-gradient-to-l from-dark-950/90 via-dark-950/50 to-transparent z-20 pointer-events-none" />
+              <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-r from-dark-950/90 via-dark-950/50 to-transparent z-20 pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-l from-dark-950/90 via-dark-950/50 to-transparent z-20 pointer-events-none" />
               
               {/* Scrolling content */}
               <div className="relative overflow-hidden">
