@@ -7,8 +7,9 @@ import { canCreateSocietyClient } from "@/lib/auth/roles.client";
 import { uploadToCloudinary } from "@/lib/cloudinary/upload";
 import { addCreatorAsAdmin } from "@/lib/actions/membership";
 import { ImageUpload } from "@/components/ui/ImageUpload";
+import { PhoneInput } from "@/components/ui/PhoneInput";
 import { getUserFriendlyError } from "@/lib/utils/errors";
-import { Loader2, ArrowLeft, Sparkles, Clock, CheckCircle, Phone } from "lucide-react";
+import { Loader2, ArrowLeft, Sparkles, Clock, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import type { SocietyStatus } from "@/types/database";
 
@@ -18,6 +19,7 @@ export default function CreateSocietyPage() {
   const [category, setCategory] = useState("");
   const [university, setUniversity] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [isPhoneValid, setIsPhoneValid] = useState(false);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -341,19 +343,14 @@ export default function CreateSocietyPage() {
                 <label className="block text-sm font-medium text-dark-100 mb-2">
                   Contact Phone Number *
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Phone className="h-5 w-5 text-dark-400" />
-                  </div>
-                  <input
-                    type="tel"
-                    required
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-dark-800 border border-dark-600 rounded-xl text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent transition-all"
-                    placeholder="e.g., +92 300 1234567"
-                  />
-                </div>
+                <PhoneInput
+                  value={phoneNumber}
+                  onChange={(value, isValid) => {
+                    setPhoneNumber(value);
+                    setIsPhoneValid(isValid);
+                  }}
+                  required
+                />
                 <p className="mt-2 text-xs text-accent-400 font-medium">
                   💡 We may contact you to verify your request and ensure legitimacy. Your number won&apos;t be shared publicly.
                 </p>
@@ -393,7 +390,7 @@ export default function CreateSocietyPage() {
               </Link>
               <button
                 type="submit"
-                disabled={loading || !name}
+                disabled={loading || !name || !university || (!isPlatformAdmin && !isPhoneValid)}
                 className="w-full sm:w-auto px-6 py-3 bg-accent-500 text-white font-semibold rounded-xl hover:bg-accent-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center btn-glow"
               >
                 {loading ? (
