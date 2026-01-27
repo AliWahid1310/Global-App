@@ -143,6 +143,31 @@ export default async function DashboardPage() {
           </div>
         )}
 
+        {/* Create Society CTA - shown when user has no admin societies */}
+        {approvedAdminSocieties.length === 0 && memberships.length > 0 && (
+          <div className="mb-12">
+            <Link
+              href="/dashboard/societies/create"
+              className="block glass rounded-2xl p-6 hover:bg-white/5 transition-colors border border-accent-500/20"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-accent-500/20 flex items-center justify-center">
+                    <Plus className="w-6 h-6 text-accent-400" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-semibold text-white">Start Your Own Society</p>
+                    <p className="text-sm text-dark-300">
+                      Have a passion or interest? Create a society and build your community!
+                    </p>
+                  </div>
+                </div>
+                <ArrowRight className="w-5 h-5 text-accent-400" />
+              </div>
+            </Link>
+          </div>
+        )}
+
         {/* Pending Societies (user's own requests) */}
         {pendingSocieties.length > 0 && (
           <div className="mb-12">
