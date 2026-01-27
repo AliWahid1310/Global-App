@@ -1,12 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, LayoutDashboard } from "lucide-react";
 import { Typewriter } from "@/components/ui/Typewriter";
 import { FloatingCards } from "@/components/ui/FloatingCards";
 import { useEffect, useState } from "react";
 
-export function HeroSection() {
+interface HeroSectionProps {
+  isLoggedIn?: boolean;
+}
+
+export function HeroSection({ isLoggedIn = false }: HeroSectionProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -82,12 +86,22 @@ export function HeroSection() {
               <ArrowRight className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             
-            <Link
-              href="/register"
-              className="inline-flex items-center justify-center gap-2 px-10 py-4 glass-light text-white font-semibold rounded-2xl hover:bg-white/10 transition-all text-lg"
-            >
-              Create Account
-            </Link>
+            {isLoggedIn ? (
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center justify-center gap-2 px-10 py-4 glass-light text-white font-semibold rounded-2xl hover:bg-white/10 transition-all text-lg"
+              >
+                <LayoutDashboard className="w-5 h-5" />
+                Dashboard
+              </Link>
+            ) : (
+              <Link
+                href="/register"
+                className="inline-flex items-center justify-center gap-2 px-10 py-4 glass-light text-white font-semibold rounded-2xl hover:bg-white/10 transition-all text-lg"
+              >
+                Create Account
+              </Link>
+            )}
           </div>
         </div>
       </section>
