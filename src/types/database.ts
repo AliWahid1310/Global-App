@@ -59,6 +59,7 @@ export interface Database {
           category: string | null;
           is_public: boolean;
           status: SocietyStatus;
+          contact_phone: string | null;
           created_by: string | null;
           created_at: string;
           updated_at: string;
@@ -74,6 +75,7 @@ export interface Database {
           category?: string | null;
           is_public?: boolean;
           status?: SocietyStatus;
+          contact_phone?: string | null;
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;

@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { isPlatformAdmin } from "@/lib/auth/roles";
-import { ArrowLeft, Shield, Users, Clock, MapPin } from "lucide-react";
+import { ArrowLeft, Shield, Users, Clock, MapPin, Phone } from "lucide-react";
 import { ApprovalActions } from "@/app/dashboard/admin/societies/ApprovalActions";
 import type { Society, Profile } from "@/types/database";
 
@@ -149,9 +149,23 @@ export default async function AdminSocietiesPage() {
                       </div>
 
                       {society.description && (
-                        <p className="text-dark-300 text-sm mb-4 line-clamp-2">
+                        <p className="text-dark-300 text-sm mb-3 line-clamp-2">
                           {society.description}
                         </p>
+                      )}
+
+                      {/* Contact Phone for verification */}
+                      {society.contact_phone && (
+                        <div className="flex items-center gap-2 text-sm text-dark-300 mb-4 bg-dark-800/50 px-3 py-2 rounded-lg w-fit">
+                          <Phone className="w-4 h-4 text-accent-400" />
+                          <span>Contact: </span>
+                          <a 
+                            href={`tel:${society.contact_phone}`}
+                            className="text-accent-400 hover:text-accent-300 font-medium"
+                          >
+                            {society.contact_phone}
+                          </a>
+                        </div>
                       )}
 
                       {/* Actions */}

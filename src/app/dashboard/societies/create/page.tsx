@@ -8,7 +8,7 @@ import { uploadToCloudinary } from "@/lib/cloudinary/upload";
 import { addCreatorAsAdmin } from "@/lib/actions/membership";
 import { ImageUpload } from "@/components/ui/ImageUpload";
 import { getUserFriendlyError } from "@/lib/utils/errors";
-import { Loader2, ArrowLeft, Sparkles, Clock, CheckCircle } from "lucide-react";
+import { Loader2, ArrowLeft, Sparkles, Clock, CheckCircle, Phone } from "lucide-react";
 import Link from "next/link";
 import type { SocietyStatus } from "@/types/database";
 
@@ -17,6 +17,7 @@ export default function CreateSocietyPage() {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [university, setUniversity] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -120,6 +121,7 @@ export default function CreateSocietyPage() {
         created_by: user.id,
         is_public: true,
         status: permissions.defaultStatus, // 'approved' for admins, 'pending' for normal users
+        contact_phone: phoneNumber || null, // Store phone for verification
       };
 
       const { data: society, error: societyError } = await supabase
@@ -331,6 +333,31 @@ export default function CreateSocietyPage() {
                 />
               </div>
             </div>
+
+            {/* Phone Number - Required for non-admin users */}
+            {!isPlatformAdmin && (
+              <div>
+                <label className="block text-sm font-medium text-dark-100 mb-2">
+                  Contact Phone Number *
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Phone className="h-5 w-5 text-dark-400" />
+                  </div>
+                  <input
+                    type="tel"
+                    required
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 bg-dark-800 border border-dark-600 rounded-xl text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent transition-all"
+                    placeholder="e.g., +92 300 1234567"
+                  />
+                </div>
+                <p className="mt-2 text-xs text-dark-400">
+                  We may contact you to verify your request and ensure legitimacy. Your number won&apos;t be shared publicly.
+                </p>
+              </div>
+            )}
 
             <div className="grid sm:grid-cols-2 gap-6">
               <div>
