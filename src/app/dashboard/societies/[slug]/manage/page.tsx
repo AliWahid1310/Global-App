@@ -2,7 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { isPlatformAdmin } from "@/lib/auth/roles";
-import { MembershipManager } from "@/components/society/MembershipManager";
+import { MembershipSection } from "@/components/society/MembershipSection";
 import { PostManager } from "@/components/society/PostManager";
 import { EventManager } from "@/components/society/EventManager";
 import { ArrowLeft, Users, FileText, Calendar, Settings, ExternalLink, Shield } from "lucide-react";
@@ -148,39 +148,12 @@ export default async function ManageSocietyPage({ params }: Props) {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Members Section */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Pending Requests */}
-            <section className="glass-light rounded-2xl p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center">
-                  <Users className="h-5 w-5 text-yellow-400" />
-                </div>
-                <h2 className="text-lg font-semibold text-white">
-                  Pending Requests ({pendingMembers.length})
-                </h2>
-              </div>
-              <MembershipManager
-                societyId={society.id}
-                members={pendingMembers}
-                type="pending"
-              />
-            </section>
-
-            {/* Current Members */}
-            <section className="glass-light rounded-2xl p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
-                  <Users className="h-5 w-5 text-green-400" />
-                </div>
-                <h2 className="text-lg font-semibold text-white">
-                  Members ({approvedMembers.length})
-                </h2>
-              </div>
-              <MembershipManager
-                societyId={society.id}
-                members={approvedMembers}
-                type="approved"
-              />
-            </section>
+            {/* Members Section - Combined pending and approved */}
+            <MembershipSection
+              societyId={society.id}
+              pendingMembers={pendingMembers}
+              approvedMembers={approvedMembers}
+            />
 
             {/* Posts Section */}
             <section className="glass-light rounded-2xl p-6">
