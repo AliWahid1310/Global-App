@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   title: "Circl | Connect, Collaborate, Create",
   description:
     "A cross-university platform for student communities to connect, share events, and build connections.",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/apple-icon.svg",
+  },
 };
 
 export default function RootLayout({
