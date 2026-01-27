@@ -322,10 +322,11 @@ export default function CreateSocietyPage() {
 
               <div>
                 <label className="block text-sm font-medium text-dark-100 mb-2">
-                  University
+                  University *
                 </label>
                 <input
                   type="text"
+                  required
                   value={university}
                   onChange={(e) => setUniversity(e.target.value)}
                   className="w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-xl text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent transition-all"
@@ -359,7 +360,7 @@ export default function CreateSocietyPage() {
               </div>
             )}
 
-            <div className="grid sm:grid-cols-2 gap-6">
+            <div className="grid sm:grid-cols-2 gap-6 mt-8">
               <div>
                 <label className="block text-sm font-medium text-dark-100 mb-2">
                   Logo Image
