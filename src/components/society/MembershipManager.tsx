@@ -132,14 +132,14 @@ export function MembershipManager({
       case "approve":
         return {
           title: "Approve Member",
-          message: `Are you sure you want to approve ${memberName} to join this society? They'll become an active member.`,
+          message: `Are you sure you want to approve ${memberName} to join this society?`,
           confirmText: "Approve",
-          variant: "success" as const,
+          variant: "info" as const,
         };
       case "reject":
         return {
           title: "Reject Request",
-          message: `Are you sure you want to reject ${memberName}'s membership request? This action cannot be undone.`,
+          message: `Are you sure you want to reject ${memberName}'s membership request?`,
           confirmText: "Reject",
           variant: "danger" as const,
         };
@@ -155,16 +155,16 @@ export function MembershipManager({
           title: `Promote to ${newRole === "admin" ? "Admin" : "Moderator"}`,
           message: `Are you sure you want to promote ${memberName} to ${newRole}? ${
             newRole === "admin" 
-              ? "Admins have full control over the society including member management." 
-              : "Moderators can create and manage posts and events."
+              ? "Admins have full control over the society." 
+              : "Moderators can manage posts and events."
           }`,
           confirmText: "Promote",
-          variant: "info" as const,
+          variant: "warning" as const,
         };
       case "demote":
         return {
           title: "Demote to Member",
-          message: `Are you sure you want to demote ${memberName} to a regular member? They will lose their current privileges.`,
+          message: `Are you sure you want to demote ${memberName} to a regular member? They will lose their moderator privileges.`,
           confirmText: "Demote",
           variant: "warning" as const,
         };
