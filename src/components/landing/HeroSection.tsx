@@ -223,7 +223,7 @@ export function HeroSection({ isLoggedIn = false }: HeroSectionProps) {
             }
           }
           .animate-university-scroll {
-            animation: universityScroll 35s linear infinite;
+            animation: universityScroll 20s linear infinite;
             will-change: transform;
           }
           @media (min-width: 640px) {
