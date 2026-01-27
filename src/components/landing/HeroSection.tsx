@@ -150,7 +150,7 @@ export function HeroSection({ isLoggedIn = false }: HeroSectionProps) {
               
               {/* Scrolling content */}
               <div className="relative overflow-hidden">
-                <div className="flex animate-university-scroll gap-8 items-center">
+                <div className="flex animate-university-scroll gap-4 sm:gap-8 items-center">
                   {[
                     "Air University",
                     "NUST",
@@ -202,8 +202,13 @@ export function HeroSection({ isLoggedIn = false }: HeroSectionProps) {
             }
           }
           .animate-university-scroll {
-            animation: universityScroll 25s linear infinite;
+            animation: universityScroll 15s linear infinite;
             will-change: transform;
+          }
+          @media (min-width: 640px) {
+            .animate-university-scroll {
+              animation: universityScroll 25s linear infinite;
+            }
           }
           .animate-university-scroll:hover {
             animation-play-state: paused;
