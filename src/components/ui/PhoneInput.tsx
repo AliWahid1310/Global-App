@@ -120,8 +120,8 @@ export function PhoneInput({ value, onChange, required = false }: PhoneInputProp
             onClick={() => setIsOpen(!isOpen)}
             className="flex items-center gap-2 px-3 py-3 bg-dark-800 border-r border-dark-600 rounded-l-xl text-white hover:bg-dark-700 focus:outline-none transition-all h-[50px]"
           >
-            <span className="text-xl">{selectedCountry.flag}</span>
-            <span className="text-dark-300 text-sm font-medium">{selectedCountry.dialCode}</span>
+            <span className="text-xl leading-none">{selectedCountry.flag}</span>
+            <span className="text-dark-300 text-sm font-medium leading-none">{selectedCountry.dialCode}</span>
             <ChevronDown className={`h-4 w-4 text-dark-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
           </button>
 
