@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Crop } from "lucide-react";
+import { ImageCropper } from "./ImageCropper";
 
 interface ImageUploadProps {
   onFileSelect: (file: File | null) => void;
@@ -21,6 +22,9 @@ export function ImageUpload({
 }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(currentImage || null);
   const [dragActive, setDragActive] = useState(false);
+  const [showCropper, setShowCropper] = useState(false);
+  const [originalImage, setOriginalImage] = useState<string | null>(null);
+  const [originalFileName, setOriginalFileName] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Sync preview with currentImage prop changes
@@ -28,7 +32,19 @@ export function ImageUpload({
     setPreview(currentImage || null);
   }, [currentImage]);
 
-  const handleFile = (file: File | null) => {
+  // Get aspect ratio number for cropper
+  const getAspectRatio = () => {
+    switch (aspectRatio) {
+      case "square":
+        return 1;
+      case "banner":
+        return 16 / 9;
+      default:
+        return 1;
+    }
+  };
+
+  const handleFileSelection = (file: File | null) => {
     if (file) {
       // Validate file type
       if (!file.type.startsWith("image/")) {
@@ -41,15 +57,38 @@ export function ImageUpload({
         return;
       }
 
+      // Store original filename
+      setOriginalFileName(file.name);
+
+      // Read file and open cropper
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPreview(reader.result as string);
+        setOriginalImage(reader.result as string);
+        setShowCropper(true);
       };
       reader.readAsDataURL(file);
-      onFileSelect(file);
-    } else {
-      setPreview(null);
-      onFileSelect(null);
+    }
+  };
+
+  const handleCropComplete = (croppedFile: File) => {
+    // Create preview from cropped file
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result as string);
+    };
+    reader.readAsDataURL(croppedFile);
+
+    // Pass cropped file to parent
+    onFileSelect(croppedFile);
+    setShowCropper(false);
+    setOriginalImage(null);
+  };
+
+  const handleCropCancel = () => {
+    setShowCropper(false);
+    setOriginalImage(null);
+    if (inputRef.current) {
+      inputRef.current.value = "";
     }
   };
 
@@ -68,13 +107,13 @@ export function ImageUpload({
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFile(e.dataTransfer.files[0]);
+      handleFileSelection(e.dataTransfer.files[0]);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      handleFile(e.target.files[0]);
+      handleFileSelection(e.target.files[0]);
     }
   };
 
@@ -87,6 +126,14 @@ export function ImageUpload({
     }
   };
 
+  const handleEditCrop = () => {
+    // Re-open cropper with current preview
+    if (preview) {
+      setOriginalImage(preview);
+      setShowCropper(true);
+    }
+  };
+
   const heightClass = aspectRatio === "banner" ? "h-32" : "h-40";
 
   const handleClick = () => {
@@ -94,55 +141,83 @@ export function ImageUpload({
   };
 
   return (
-    <div
-      className={`relative ${heightClass} border-2 border-dashed rounded-xl transition-all ${
-        dragActive
-          ? "border-accent-500 bg-accent-500/10"
-          : "border-dark-600 hover:border-dark-500 bg-dark-800/50"
-      }`}
-      onDragEnter={handleDrag}
-      onDragLeave={handleDrag}
-      onDragOver={handleDrag}
-      onDrop={handleDrop}
-      onClick={!preview ? handleClick : undefined}
-    >
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleChange}
-        className="hidden"
-      />
+    <>
+      <div
+        className={`relative ${heightClass} border-2 border-dashed rounded-xl transition-all ${
+          dragActive
+            ? "border-accent-500 bg-accent-500/10"
+            : "border-dark-600 hover:border-dark-500 bg-dark-800/50"
+        }`}
+        onDragEnter={handleDrag}
+        onDragLeave={handleDrag}
+        onDragOver={handleDrag}
+        onDrop={handleDrop}
+        onClick={!preview ? handleClick : undefined}
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleChange}
+          className="hidden"
+        />
 
-      {preview ? (
-        <div className="relative w-full h-full">
-          <Image
-            src={preview}
-            alt="Preview"
-            fill
-            className="object-cover rounded-xl"
-          />
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              clearImage();
-            }}
-            className="absolute top-2 right-2 p-1.5 bg-dark-900/80 rounded-full text-white hover:bg-dark-900 transition-all z-10"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center h-full w-full text-dark-400 cursor-pointer px-4 py-4">
-          <Upload className="h-6 w-6 sm:h-8 sm:w-8 mb-2 flex-shrink-0" />
-          <span className="text-sm text-dark-300 text-center">{placeholder}</span>
-          <span className="text-xs text-dark-500 mt-1 text-center">
-            Drag & drop or click to browse
-          </span>
-        </div>
+        {preview ? (
+          <div className="relative w-full h-full">
+            <Image
+              src={preview}
+              alt="Preview"
+              fill
+              className="object-cover rounded-xl"
+            />
+            <div className="absolute top-2 right-2 flex gap-1.5 z-10">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleEditCrop();
+                }}
+                className="p-1.5 bg-dark-900/80 rounded-full text-white hover:bg-dark-900 transition-all"
+                title="Edit crop"
+              >
+                <Crop className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  clearImage();
+                }}
+                className="p-1.5 bg-dark-900/80 rounded-full text-white hover:bg-dark-900 transition-all"
+                title="Remove image"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full w-full text-dark-400 cursor-pointer px-4 py-4">
+            <Upload className="h-6 w-6 sm:h-8 sm:w-8 mb-2 flex-shrink-0" />
+            <span className="text-sm text-dark-300 text-center">{placeholder}</span>
+            <span className="text-xs text-dark-500 mt-1 text-center">
+              Drag & drop or click to browse
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Image Cropper Modal */}
+      {showCropper && originalImage && (
+        <ImageCropper
+          image={originalImage}
+          aspectRatio={getAspectRatio()}
+          onCropComplete={handleCropComplete}
+          onCancel={handleCropCancel}
+          originalFileName={originalFileName || "image.jpg"}
+        />
       )}
-    </div>
+    </>
   );
 }
