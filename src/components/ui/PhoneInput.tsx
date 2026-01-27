@@ -112,13 +112,13 @@ export function PhoneInput({ value, onChange, required = false }: PhoneInputProp
 
   return (
     <div className="space-y-2">
-      <div className="flex rounded-xl border border-dark-600 focus-within:ring-2 focus-within:ring-accent-500 focus-within:border-transparent transition-all overflow-hidden">
+      <div className="relative flex rounded-xl border border-dark-600 focus-within:ring-2 focus-within:ring-accent-500 focus-within:border-transparent transition-all">
         {/* Country Selector */}
         <div className="relative" ref={dropdownRef}>
           <button
             type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center gap-2 px-3 py-3 bg-dark-800 border-r border-dark-600 text-white hover:bg-dark-700 focus:outline-none transition-all h-[50px]"
+            className="flex items-center gap-2 px-3 py-3 bg-dark-800 border-r border-dark-600 rounded-l-xl text-white hover:bg-dark-700 focus:outline-none transition-all h-[50px]"
           >
             <span className="text-xl">{selectedCountry.flag}</span>
             <span className="text-dark-300 text-sm font-medium">{selectedCountry.dialCode}</span>
@@ -151,7 +151,7 @@ export function PhoneInput({ value, onChange, required = false }: PhoneInputProp
           type="tel"
           value={phoneDigits}
           onChange={handleDigitsChange}
-          className="flex-1 px-4 py-3 bg-dark-800 text-white placeholder-dark-400 focus:outline-none transition-all"
+          className="flex-1 px-4 py-3 bg-dark-800 rounded-r-xl text-white placeholder-dark-400 focus:outline-none transition-all"
           placeholder="300 1234567"
         />
       </div>
