@@ -170,7 +170,14 @@ export function ImageCropper({
         <div className="px-4 py-4 bg-dark-850 border-t border-dark-700">
           {/* Zoom Slider */}
           <div className="flex items-center justify-center gap-3 mb-4">
-            <ZoomOut className="h-5 w-5 text-dark-400" />
+            <button
+              type="button"
+              onClick={handleZoomOut}
+              disabled={zoom <= 1}
+              className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ZoomOut className="h-5 w-5" />
+            </button>
             <input
               type="range"
               min={1}
@@ -180,7 +187,14 @@ export function ImageCropper({
               onChange={(e) => setZoom(Number(e.target.value))}
               className="flex-1 max-w-xs h-2 bg-dark-700 rounded-lg appearance-none cursor-pointer accent-accent-500 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-accent-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-lg"
             />
-            <ZoomIn className="h-5 w-5 text-dark-400" />
+            <button
+              type="button"
+              onClick={handleZoomIn}
+              disabled={zoom >= 3}
+              className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ZoomIn className="h-5 w-5" />
+            </button>
             <button
               type="button"
               onClick={handleReset}
