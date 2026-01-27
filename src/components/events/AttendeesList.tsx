@@ -31,7 +31,10 @@ export function AttendeesList({
   const [searchQuery, setSearchQuery] = useState("");
   const [showAll, setShowAll] = useState(false);
 
-  const filteredAttendees = attendees.filter((a) => {
+  // Filter out platform admins from the attendees list (they should remain hidden)
+  const visibleAttendees = attendees.filter((a) => !a.user?.is_admin);
+
+  const filteredAttendees = visibleAttendees.filter((a) => {
     const matchesFilter = filter === "all" || a.status === filter;
     const matchesSearch =
       !searchQuery ||
@@ -44,10 +47,10 @@ export function AttendeesList({
     ? filteredAttendees
     : filteredAttendees.slice(0, maxDisplay);
 
-  const goingCount = attendees.filter((a) => a.status === "going").length;
-  const maybeCount = attendees.filter((a) => a.status === "maybe").length;
-  const waitlistCount = attendees.filter((a) => a.status === "waitlist").length;
-  const totalGuests = attendees
+  const goingCount = visibleAttendees.filter((a) => a.status === "going").length;
+  const maybeCount = visibleAttendees.filter((a) => a.status === "maybe").length;
+  const waitlistCount = visibleAttendees.filter((a) => a.status === "waitlist").length;
+  const totalGuests = visibleAttendees
     .filter((a) => a.status === "going")
     .reduce((sum, a) => sum + (a.guest_count || 0), 0);
 
@@ -63,7 +66,7 @@ export function AttendeesList({
               : "bg-dark-700 text-dark-300 hover:bg-dark-600"
           }`}
         >
-          All ({attendees.length})
+          All ({visibleAttendees.length})
         </button>
         <button
           onClick={() => setFilter("going")}
@@ -106,7 +109,7 @@ export function AttendeesList({
       </div>
 
       {/* Search */}
-      {attendees.length > 5 && (
+      {visibleAttendees.length > 5 && (
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-400" />
           <input
@@ -213,7 +216,9 @@ export function AttendeesPreview({
   attendees: RSVPWithUser[];
   limit?: number;
 }) {
-  const goingAttendees = attendees.filter((a) => a.status === "going");
+  // Filter out platform admins from the preview (they should remain hidden)
+  const visibleAttendees = attendees.filter((a) => !a.user?.is_admin);
+  const goingAttendees = visibleAttendees.filter((a) => a.status === "going");
   const displayAttendees = goingAttendees.slice(0, limit);
   const remaining = goingAttendees.length - limit;
 

@@ -65,12 +65,15 @@ export default async function EventManagePage({ params }: Props) {
 
   const rsvps = (rsvpsData || []) as RSVPWithUser[];
 
-  // Calculate counts from fetched RSVPs
+  // Filter out platform admins from counts (they should remain hidden)
+  const visibleRsvps = rsvps.filter(r => !r.user?.is_admin);
+
+  // Calculate counts from visible RSVPs (excluding platform admins)
   const counts = {
-    going: rsvps.filter(r => r.status === "going").length,
-    maybe: rsvps.filter(r => r.status === "maybe").length,
-    waitlist: rsvps.filter(r => r.status === "waitlist").length,
-    total_guests: rsvps.reduce((sum, r) => sum + (r.guest_count || 0), 0),
+    going: visibleRsvps.filter(r => r.status === "going").length,
+    maybe: visibleRsvps.filter(r => r.status === "maybe").length,
+    waitlist: visibleRsvps.filter(r => r.status === "waitlist").length,
+    total_guests: visibleRsvps.reduce((sum, r) => sum + (r.guest_count || 0), 0),
   };
 
   const eventDate = new Date(event.start_time);

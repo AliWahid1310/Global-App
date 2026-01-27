@@ -68,7 +68,9 @@ export default async function ManageSocietyPage({ params }: Props) {
     .eq("status", "pending")
     .order("joined_at", { ascending: true });
 
-  const pendingMembers = (pendingMembersData || []) as (SocietyMember & { profile: Profile | null })[];
+  // Filter out platform admins from pending members (they shouldn't appear in member lists)
+  const pendingMembers = ((pendingMembersData || []) as (SocietyMember & { profile: Profile | null })[])
+    .filter(m => !m.profile?.is_admin);
 
   // Fetch approved members
   const { data: approvedMembersData } = await supabase
@@ -83,7 +85,9 @@ export default async function ManageSocietyPage({ params }: Props) {
     .eq("status", "approved")
     .order("role", { ascending: true });
 
-  const approvedMembers = (approvedMembersData || []) as (SocietyMember & { profile: Profile | null })[];
+  // Filter out platform admins from approved members (they shouldn't appear in member lists)
+  const approvedMembers = ((approvedMembersData || []) as (SocietyMember & { profile: Profile | null })[])
+    .filter(m => !m.profile?.is_admin);
 
   // Fetch posts
   const { data: postsData } = await supabase

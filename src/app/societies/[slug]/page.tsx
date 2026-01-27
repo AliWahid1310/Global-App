@@ -56,12 +56,20 @@ export default async function SocietyPage({ params }: Props) {
     notFound();
   }
 
-  // Fetch member count
-  const { count: memberCount } = await supabase
+  // Fetch member count (excluding platform admins who should remain hidden)
+  const { data: membersForCount } = await supabase
     .from("society_members")
-    .select("*", { count: "exact", head: true })
+    .select(`
+      id,
+      profile:profiles(is_admin)
+    `)
     .eq("society_id", society.id)
     .eq("status", "approved");
+  
+  // Filter out platform admins from count
+  const memberCount = (membersForCount || []).filter(
+    (m: any) => !m.profile?.is_admin
+  ).length;
 
   // Fetch recent posts
   const { data: postsData } = await supabase
