@@ -159,7 +159,7 @@ export function MembershipManager({
               : "Moderators can manage posts and events."
           }`,
           confirmText: "Promote",
-          variant: "warning" as const,
+          variant: "info" as const,
         };
       case "demote":
         return {
