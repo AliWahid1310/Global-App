@@ -6,7 +6,7 @@ import { isPlatformAdmin } from "@/lib/auth/roles";
 import { PostCard } from "@/components/society/PostCard";
 import { EventCard } from "@/components/society/EventCard";
 import { JoinButton } from "@/components/society/JoinButton";
-import { Users, MapPin, Calendar, MessageCircle, Sparkles, ArrowRight, Shield } from "lucide-react";
+import { Users, MapPin, Calendar, MessageCircle, Sparkles, ArrowRight, Shield, Award } from "lucide-react";
 import type { Society, Post, Event, Profile, SocietyMember } from "@/types/database";
 
 type PostWithAuthor = Post & { author: Profile | null };
@@ -160,9 +160,17 @@ export default async function SocietyPage({ params }: Props) {
               <div className="flex-1">
                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                   <div>
-                    <h1 className="text-4xl font-display font-bold text-white mb-3">
-                      {society.name}
-                    </h1>
+                    <div className="flex items-center gap-3 mb-3">
+                      <h1 className="text-4xl font-display font-bold text-white">
+                        {society.name}
+                      </h1>
+                      {society.is_founding && (
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-white rounded-full shadow-lg shadow-amber-500/30">
+                          <Award className="w-4 h-4" />
+                          <span className="text-sm font-semibold">Founding Society</span>
+                        </div>
+                      )}
+                    </div>
                     {society.category && (
                       <span className="inline-flex items-center gap-1 px-4 py-1.5 bg-accent-500/20 text-accent-300 text-sm font-medium rounded-full border border-accent-500/30">
                         <Sparkles className="h-3.5 w-3.5" />

@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import type { Society } from "@/types/database";
-import { Users, MapPin, ArrowRight } from "lucide-react";
+import { Users, MapPin, ArrowRight, Award } from "lucide-react";
 
 interface SocietyCardProps {
   society: Society;
@@ -46,14 +46,23 @@ export function SocietyCard({ society, memberCount }: SocietyCardProps) {
               />
             )}
             
-            {/* Category badge */}
-            {society.category && (
-              <div className="absolute top-4 right-4">
+            {/* Badges container */}
+            <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
+              {/* Founding Society badge */}
+              {society.is_founding && (
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-amber-500/90 to-yellow-500/90 backdrop-blur-sm text-white rounded-full shadow-lg shadow-amber-500/30">
+                  <Award className="w-3.5 h-3.5" />
+                  <span className="text-xs font-semibold">Founding Society</span>
+                </div>
+              )}
+              
+              {/* Category badge */}
+              {society.category && (
                 <span className="px-3 py-1 text-xs font-medium bg-white/10 backdrop-blur-sm text-white rounded-full">
                   {society.category}
                 </span>
-              </div>
-            )}
+              )}
+            </div>
 
             {/* Logo */}
             <div className="absolute -bottom-8 left-6">

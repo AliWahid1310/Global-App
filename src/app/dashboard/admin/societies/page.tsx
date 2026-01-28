@@ -3,8 +3,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { isPlatformAdmin } from "@/lib/auth/roles";
-import { ArrowLeft, Shield, Users, Clock, MapPin, Phone } from "lucide-react";
+import { ArrowLeft, Shield, Users, Clock, MapPin, Phone, Award } from "lucide-react";
 import { ApprovalActions } from "@/app/dashboard/admin/societies/ApprovalActions";
+import { FoundingBadgeToggle } from "@/app/dashboard/admin/societies/FoundingBadgeToggle";
 import type { Society, Profile } from "@/types/database";
 
 type SocietyWithCreator = Society & { creator: Profile | null };
@@ -205,6 +206,9 @@ export default async function AdminSocietiesPage() {
                       Status
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-dark-300 uppercase tracking-wider">
+                      Founding Badge
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-dark-300 uppercase tracking-wider">
                       Creator
                     </th>
                   </tr>
@@ -242,6 +246,15 @@ export default async function AdminSocietiesPage() {
                         >
                           {society.status === "approved" ? "Approved" : "Rejected"}
                         </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        {society.status === "approved" && (
+                          <FoundingBadgeToggle
+                            societyId={society.id}
+                            societyName={society.name}
+                            isFounding={society.is_founding || false}
+                          />
+                        )}
                       </td>
                       <td className="px-6 py-4 text-dark-300 text-sm">
                         {society.creator?.full_name || society.creator?.email || "Unknown"}

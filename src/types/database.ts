@@ -60,6 +60,7 @@ export interface Database {
           is_public: boolean;
           status: SocietyStatus;
           contact_phone: string | null;
+          is_founding: boolean;
           created_by: string | null;
           created_at: string;
           updated_at: string;
@@ -76,6 +77,7 @@ export interface Database {
           is_public?: boolean;
           status?: SocietyStatus;
           contact_phone?: string | null;
+          is_founding?: boolean;
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -91,6 +93,7 @@ export interface Database {
           category?: string | null;
           is_public?: boolean;
           status?: SocietyStatus;
+          is_founding?: boolean;
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
