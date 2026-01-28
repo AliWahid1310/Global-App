@@ -98,23 +98,9 @@ export async function getFeedItems(page: number = 0): Promise<FeedResponse> {
     return { items: [], hasMore: false, error: "Please set your university in your profile" };
   }
 
-  // Get societies user is a member of (approved only)
-  const { data: membershipsData } = await supabase
-    .from("society_members")
-    .select("society_id")
-    .eq("user_id", user.id)
-    .eq("status", "approved");
-
-  const memberships = (membershipsData || []) as MembershipRow[];
-  const memberSocietyIds = memberships.map((m) => m.society_id);
-
-  if (memberSocietyIds.length === 0) {
-    return { items: [], hasMore: false };
-  }
-
   const offset = page * FEED_PAGE_SIZE;
 
-  // Fetch events from user's societies
+  // Fetch events from ALL societies in user's university
   const { data: eventsRaw } = await supabase
     .from("events")
     .select(`
@@ -136,14 +122,14 @@ export async function getFeedItems(page: number = 0): Promise<FeedResponse> {
         university
       )
     `)
-    .in("society_id", memberSocietyIds)
+    .eq("society.university", profile.university)
     .eq("is_public", true)
     .gte("start_time", new Date().toISOString())
     .order("created_at", { ascending: false });
 
   const eventsData = (eventsRaw || []) as unknown as EventRow[];
 
-  // Fetch announcements/posts from user's societies
+  // Fetch announcements/posts from ALL societies in user's university
   const { data: postsRaw } = await supabase
     .from("posts")
     .select(`
@@ -163,7 +149,7 @@ export async function getFeedItems(page: number = 0): Promise<FeedResponse> {
         university
       )
     `)
-    .in("society_id", memberSocietyIds)
+    .eq("society.university", profile.university)
     .order("created_at", { ascending: false });
 
   const postsData = (postsRaw || []) as unknown as PostRow[];
