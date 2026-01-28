@@ -353,6 +353,26 @@ export interface Database {
           created_at?: string;
         };
       };
+      post_likes: {
+        Row: {
+          id: string;
+          post_id: string;
+          user_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          post_id: string;
+          user_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          post_id?: string;
+          user_id?: string;
+          created_at?: string;
+        };
+      };
     };
     Views: {
       [_ in never]: never;
@@ -395,6 +415,7 @@ export type EventRSVP = Database["public"]["Tables"]["event_rsvps"]["Row"];
 export type EventCheckin = Database["public"]["Tables"]["event_checkins"]["Row"];
 export type EventReminder = Database["public"]["Tables"]["event_reminders"]["Row"];
 export type ChatMessage = Database["public"]["Tables"]["chat_messages"]["Row"];
+export type PostLike = Database["public"]["Tables"]["post_likes"]["Row"];
 
 // Extended types with relations
 export type PostWithAuthor = Post & {

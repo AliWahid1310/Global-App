@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import type { AnnouncementFeedItem } from "@/types/database";
-import { Megaphone, Pin, MessageCircle, Share2, Heart, AlertTriangle, Trophy, Zap } from "lucide-react";
+import { Megaphone, Pin, Heart, AlertTriangle, Trophy, Zap } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 interface AnnouncementFeedCardProps {
   item: AnnouncementFeedItem;
@@ -29,19 +30,108 @@ const getBadgeType = (title: string, content: string | null) => {
 
 export function AnnouncementFeedCard({ item, featured = false }: AnnouncementFeedCardProps) {
   const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(Math.floor(Math.random() * 50) + 5);
+  const [likeCount, setLikeCount] = useState(0);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const timeAgo = formatDistanceToNow(new Date(item.created_at), { addSuffix: true });
   const badge = getBadgeType(item.title, item.description);
   const BadgeIcon = badge.icon;
 
-  const handleLike = () => {
-    if (liked) {
-      setLikeCount((prev) => prev - 1);
-    } else {
-      setLikeCount((prev) => prev + 1);
+  // Fetch initial like data and set up real-time subscription
+  useEffect(() => {
+    const supabase = createClient();
+
+    const fetchLikes = async () => {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+      }
+
+      // Get like count
+      const { count } = await supabase
+        .from("post_likes")
+        .select("*", { count: "exact", head: true })
+        .eq("post_id", item.id);
+
+      setLikeCount(count || 0);
+
+      // Check if user has liked
+      if (user) {
+        const { data: existingLike } = await supabase
+          .from("post_likes")
+          .select("id")
+          .eq("post_id", item.id)
+          .eq("user_id", user.id)
+          .single();
+
+        setLiked(!!existingLike);
+      }
+    };
+
+    fetchLikes();
+
+    // Set up real-time subscription for likes
+    const channel = supabase
+      .channel(`post_likes_${item.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "post_likes",
+          filter: `post_id=eq.${item.id}`,
+        },
+        async () => {
+          // Refetch like count when likes change
+          const { count } = await supabase
+            .from("post_likes")
+            .select("*", { count: "exact", head: true })
+            .eq("post_id", item.id);
+
+          setLikeCount(count || 0);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [item.id]);
+
+  const handleLike = async () => {
+    if (!userId || isLoading) return;
+
+    setIsLoading(true);
+    const supabase = createClient();
+
+    try {
+      if (liked) {
+        // Unlike - delete the like
+        await supabase
+          .from("post_likes")
+          .delete()
+          .eq("post_id", item.id)
+          .eq("user_id", userId);
+
+        setLiked(false);
+        setLikeCount((prev) => Math.max(0, prev - 1));
+      } else {
+        // Like - insert new like
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase as any)
+          .from("post_likes")
+          .insert({ post_id: item.id, user_id: userId });
+
+        setLiked(true);
+        setLikeCount((prev) => prev + 1);
+      }
+    } catch (error) {
+      console.error("Error toggling like:", error);
+    } finally {
+      setIsLoading(false);
     }
-    setLiked(!liked);
   };
 
   return (
@@ -124,23 +214,13 @@ export function AnnouncementFeedCard({ item, featured = false }: AnnouncementFee
             {/* Like */}
             <button
               onClick={handleLike}
+              disabled={!userId || isLoading}
               className={`flex items-center gap-1.5 text-sm transition-colors ${
                 liked ? "text-red-400" : "text-dark-400 hover:text-red-400"
-              }`}
+              } ${!userId ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               <Heart className={`w-4 h-4 ${liked ? "fill-current" : ""}`} />
               <span className="text-xs">{likeCount}</span>
-            </button>
-
-            {/* Comment */}
-            <button className="flex items-center gap-1.5 text-dark-400 hover:text-blue-400 transition-colors">
-              <MessageCircle className="w-4 h-4" />
-              <span className="text-xs">{Math.floor(Math.random() * 15)}</span>
-            </button>
-
-            {/* Share */}
-            <button className="flex items-center gap-1.5 text-dark-400 hover:text-green-400 transition-colors">
-              <Share2 className="w-4 h-4" />
             </button>
           </div>
         </div>
