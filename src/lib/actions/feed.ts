@@ -326,8 +326,7 @@ export async function getLeaderboard(university: string | null): Promise<{
     const recentMembers = members.filter((m: any) => m.joined_at && new Date(m.joined_at) > thirtyDaysAgo).length;
     
     // Engagement score = members + (posts * 2) + (events * 3) + (recent activity bonus)
-    // Base score of 1 ensures all societies appear
-    const score = 1 + members.length + (posts.length * 2) + (events.length * 3) + (recentPosts * 5) + (recentEvents * 10);
+    const score = members.length + (posts.length * 2) + (events.length * 3) + (recentPosts * 5) + (recentEvents * 10);
     
     return {
       id: s.id,
@@ -347,9 +346,10 @@ export async function getLeaderboard(university: string | null): Promise<{
     .sort((a, b) => b.score - a.score)
     .slice(0, 5);
 
-  // Fastest growing (by member count, since we may not have joined_at data)
+  // Fastest growing (most new members in last 30 days)
   const fastestGrowing = [...societiesWithStats]
-    .sort((a, b) => b.member_count - a.member_count)
+    .filter(s => s.recent_members > 0)
+    .sort((a, b) => b.recent_members - a.recent_members)
     .slice(0, 3);
 
   // Get most active members (by number of societies joined)
