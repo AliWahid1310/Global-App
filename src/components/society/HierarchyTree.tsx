@@ -69,7 +69,7 @@ function PositionCard({ position }: { position: SocietyPositionWithUser }) {
   const tenure = formatTenure(position.tenure_start, position.tenure_end);
 
   return (
-    <div className="relative group">
+    <div className="relative group w-48">
       {/* Glow effect on hover */}
       <div className={`absolute -inset-1 bg-gradient-to-r ${config.gradient} rounded-2xl blur-lg opacity-0 group-hover:opacity-40 transition-opacity duration-500`} />
       
