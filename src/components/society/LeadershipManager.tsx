@@ -74,6 +74,32 @@ const initialFormData: PositionFormData = {
   isPresent: true,
 };
 
+// Convert "2026-03" to "2026-03-01" for database DATE type
+function monthToDate(monthStr: string | null): string | null {
+  if (!monthStr) return null;
+  return `${monthStr}-01`;
+}
+
+// Convert "2026-03-01" back to "2026-03" for month input
+function dateToMonth(dateStr: string | null): string {
+  if (!dateStr) return "";
+  return dateStr.substring(0, 7);
+}
+
+// Make error messages user-friendly
+function getUserFriendlyError(error: string): string {
+  if (error.includes("invalid input syntax for type date")) {
+    return "Please select a valid date for the tenure period.";
+  }
+  if (error.includes("duplicate key") || error.includes("unique constraint")) {
+    return "This person already has a position at this level.";
+  }
+  if (error.includes("Not authenticated")) {
+    return "Please log in to manage leadership positions.";
+  }
+  return error;
+}
+
 export function LeadershipManager({ societyId, societySlug, positions }: LeadershipManagerProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPosition, setEditingPosition] = useState<SocietyPositionWithUser | null>(null);
@@ -114,8 +140,8 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
       positionTitle: position.position_title,
       hierarchyLevel: position.hierarchy_level,
       customTitle: position.custom_title || "",
-      tenureStart: position.tenure_start || "",
-      tenureEnd: position.tenure_end || "",
+      tenureStart: dateToMonth(position.tenure_start),
+      tenureEnd: dateToMonth(position.tenure_end),
       isPresent: !position.tenure_end,
     });
     setError(null);
@@ -146,12 +172,12 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
         positionTitle,
         hierarchyLevel: formData.hierarchyLevel,
         customTitle: formData.customTitle || null,
-        tenureStart: formData.tenureStart || null,
-        tenureEnd: formData.isPresent ? null : (formData.tenureEnd || null),
+        tenureStart: monthToDate(formData.tenureStart),
+        tenureEnd: formData.isPresent ? null : monthToDate(formData.tenureEnd),
       });
 
       if (result.error) {
-        setError(result.error);
+        setError(getUserFriendlyError(result.error));
       } else {
         closeModal();
       }
@@ -164,12 +190,12 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
         positionTitle,
         hierarchyLevel: formData.hierarchyLevel,
         customTitle: formData.customTitle || null,
-        tenureStart: formData.tenureStart || null,
-        tenureEnd: formData.isPresent ? null : (formData.tenureEnd || null),
+        tenureStart: monthToDate(formData.tenureStart),
+        tenureEnd: formData.isPresent ? null : monthToDate(formData.tenureEnd),
       });
 
       if (result.error) {
-        setError(result.error);
+        setError(getUserFriendlyError(result.error));
       } else {
         closeModal();
       }
@@ -332,31 +358,40 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
       {/* Add/Edit Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={closeModal} />
-          <div className="relative bg-dark-900 border border-dark-700 rounded-2xl p-6 w-full max-w-md animate-scale-in">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={closeModal} />
+          <div className="relative glass border border-dark-600 rounded-3xl p-6 w-full max-w-md animate-scale-in shadow-2xl shadow-accent-500/10">
+            {/* Header */}
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-white">
-                {editingPosition ? "Edit Position" : "Add New Position"}
-              </h3>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
+                  <Crown className="h-5 w-5 text-amber-400" />
+                </div>
+                <h3 className="text-lg font-display font-semibold text-white">
+                  {editingPosition ? "Edit Position" : "Add New Position"}
+                </h3>
+              </div>
               <button
                 onClick={closeModal}
-                className="p-2 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-all"
+                className="p-2 text-dark-400 hover:text-white hover:bg-dark-700 rounded-xl transition-all"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
-                <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm">
-                  {error}
+                <div className="flex items-start gap-3 bg-red-500/10 border border-red-500/20 px-4 py-3 rounded-xl">
+                  <div className="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <X className="h-3 w-3 text-red-400" />
+                  </div>
+                  <p className="text-red-400 text-sm">{error}</p>
                 </div>
               )}
 
               {/* Hierarchy Level */}
               <div>
-                <label className="block text-sm font-medium text-dark-200 mb-2">
-                  Role Level *
+                <label className="block text-sm font-medium text-dark-100 mb-3">
+                  Role Level <span className="text-red-400">*</span>
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   {hierarchyLevels.map((level) => {
@@ -369,8 +404,8 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
                         onClick={() => setFormData({ ...formData, hierarchyLevel: level.value })}
                         className={`flex items-center gap-2 p-3 rounded-xl border transition-all ${
                           isSelected
-                            ? `bg-gradient-to-r ${levelColors[level.value]} border-transparent text-white`
-                            : "border-dark-600 text-dark-300 hover:border-dark-500 hover:text-white"
+                            ? `bg-gradient-to-r ${levelColors[level.value]} border-transparent text-white shadow-lg`
+                            : "border-dark-600 bg-dark-800/50 text-dark-300 hover:border-dark-500 hover:text-white hover:bg-dark-800"
                         }`}
                       >
                         <Icon className="h-4 w-4" />
@@ -383,7 +418,7 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
 
               {/* Custom Title */}
               <div>
-                <label className="block text-sm font-medium text-dark-200 mb-2">
+                <label className="block text-sm font-medium text-dark-100 mb-2">
                   Custom Title <span className="text-dark-500">(optional)</span>
                 </label>
                 <input
@@ -391,24 +426,24 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
                   value={formData.customTitle}
                   onChange={(e) => setFormData({ ...formData, customTitle: e.target.value })}
                   placeholder={`e.g., Director of Marketing`}
-                  className="w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-xl text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-dark-800/50 border border-dark-600 rounded-xl text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent transition-all"
                 />
               </div>
 
               {/* Member Selection */}
               <div>
-                <label className="block text-sm font-medium text-dark-200 mb-2">
+                <label className="block text-sm font-medium text-dark-100 mb-2">
                   Assign to Member
                 </label>
                 {loadingMembers ? (
                   <div className="flex items-center justify-center py-4">
-                    <Loader2 className="h-5 w-5 animate-spin text-dark-400" />
+                    <Loader2 className="h-5 w-5 animate-spin text-accent-400" />
                   </div>
                 ) : (
                   <select
                     value={formData.userId || ""}
                     onChange={(e) => setFormData({ ...formData, userId: e.target.value || null })}
-                    className="w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-dark-800/50 border border-dark-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent transition-all appearance-none cursor-pointer"
                   >
                     <option value="">Leave vacant</option>
                     {members.map((member) => (
@@ -422,24 +457,24 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
 
               {/* Tenure */}
               <div>
-                <label className="block text-sm font-medium text-dark-200 mb-2">
-                  <Calendar className="h-4 w-4 inline mr-1" />
+                <label className="block text-sm font-medium text-dark-100 mb-2 flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-accent-400" />
                   Tenure
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs text-dark-400 mb-1">Start Date</label>
+                    <label className="block text-xs text-dark-400 mb-1.5">Start Date</label>
                     <input
                       type="month"
                       value={formData.tenureStart}
                       onChange={(e) => setFormData({ ...formData, tenureStart: e.target.value })}
-                      className="w-full px-3 py-2 bg-dark-800 border border-dark-600 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                      className="w-full px-3 py-2.5 bg-dark-800/50 border border-dark-600 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-dark-400 mb-1">End Date</label>
+                    <label className="block text-xs text-dark-400 mb-1.5">End Date</label>
                     {formData.isPresent ? (
-                      <div className="px-3 py-2 bg-dark-800 border border-dark-600 rounded-xl text-accent-400 text-sm">
+                      <div className="px-3 py-2.5 bg-accent-500/10 border border-accent-500/30 rounded-xl text-accent-400 text-sm font-medium">
                         Present
                       </div>
                     ) : (
@@ -447,35 +482,35 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
                         type="month"
                         value={formData.tenureEnd}
                         onChange={(e) => setFormData({ ...formData, tenureEnd: e.target.value })}
-                        className="w-full px-3 py-2 bg-dark-800 border border-dark-600 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                        className="w-full px-3 py-2.5 bg-dark-800/50 border border-dark-600 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent transition-all"
                       />
                     )}
                   </div>
                 </div>
-                <label className="flex items-center gap-2 mt-2 cursor-pointer">
+                <label className="flex items-center gap-2 mt-3 cursor-pointer group">
                   <input
                     type="checkbox"
                     checked={formData.isPresent}
                     onChange={(e) => setFormData({ ...formData, isPresent: e.target.checked, tenureEnd: "" })}
-                    className="w-4 h-4 rounded border-dark-600 bg-dark-800 text-accent-500 focus:ring-accent-500"
+                    className="w-4 h-4 rounded border-dark-600 bg-dark-800/50 text-accent-500 focus:ring-accent-500 focus:ring-offset-0"
                   />
-                  <span className="text-sm text-dark-300">Currently in this role</span>
+                  <span className="text-sm text-dark-300 group-hover:text-white transition-colors">Currently in this role</span>
                 </label>
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-3 pt-6 border-t border-dark-700/50">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="flex-1 px-4 py-3 text-dark-300 hover:text-white hover:bg-dark-700 rounded-xl transition-all"
+                  className="flex-1 px-4 py-3 text-dark-300 hover:text-white bg-dark-800/50 hover:bg-dark-700 rounded-xl transition-all font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 px-4 py-3 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-xl transition-all disabled:opacity-50 inline-flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold rounded-xl transition-all disabled:opacity-50 inline-flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25"
                 >
                   {loading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
