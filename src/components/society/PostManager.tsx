@@ -13,6 +13,8 @@ import {
   Pin,
   PinOff,
   X,
+  Globe,
+  Users,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -26,6 +28,7 @@ export function PostManager({ societyId, posts }: PostManagerProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [showInFeed, setShowInFeed] = useState(true);
   const [loading, setLoading] = useState(false);
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [optimisticPosts, setOptimisticPosts] = useState<(Post & { author: Profile | null })[]>([]);
@@ -60,6 +63,7 @@ export function PostManager({ societyId, posts }: PostManagerProps) {
         title,
         content,
         image_url: imageUrl,
+        show_in_feed: showInFeed,
       };
 
       // Create optimistic post
@@ -71,6 +75,7 @@ export function PostManager({ societyId, posts }: PostManagerProps) {
         content,
         image_url: imageUrl,
         is_pinned: false,
+        show_in_feed: showInFeed,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         author: { id: user.id, email: user.email || '', full_name: user.user_metadata?.full_name || 'You', avatar_url: null, university: null, is_admin: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }
@@ -81,6 +86,7 @@ export function PostManager({ societyId, posts }: PostManagerProps) {
       setTitle("");
       setContent("");
       setImageFile(null);
+      setShowInFeed(true);
       setShowForm(false);
 
       const { error } = await (supabase.from("posts") as any).insert(postData);
@@ -201,6 +207,45 @@ export function PostManager({ societyId, posts }: PostManagerProps) {
                 Image (optional)
               </label>
               <ImageUpload onFileSelect={setImageFile} aspectRatio="banner" />
+            </div>
+
+            {/* Visibility Option */}
+            <div>
+              <label className="block text-sm font-medium text-dark-200 mb-2">
+                Visibility
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowInFeed(true)}
+                  className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
+                    showInFeed
+                      ? "border-accent-500 bg-accent-500/10 text-white"
+                      : "border-dark-600 bg-dark-800/50 text-dark-300 hover:border-dark-500"
+                  }`}
+                >
+                  <Globe className={`h-5 w-5 ${showInFeed ? "text-accent-400" : "text-dark-400"}`} />
+                  <div className="text-left">
+                    <p className="text-sm font-medium">University Feed</p>
+                    <p className="text-xs text-dark-400">Visible to everyone</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowInFeed(false)}
+                  className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
+                    !showInFeed
+                      ? "border-accent-500 bg-accent-500/10 text-white"
+                      : "border-dark-600 bg-dark-800/50 text-dark-300 hover:border-dark-500"
+                  }`}
+                >
+                  <Users className={`h-5 w-5 ${!showInFeed ? "text-accent-400" : "text-dark-400"}`} />
+                  <div className="text-left">
+                    <p className="text-sm font-medium">Society Only</p>
+                    <p className="text-xs text-dark-400">Only on society page</p>
+                  </div>
+                </button>
+              </div>
             </div>
 
             <div className="flex justify-end gap-3">

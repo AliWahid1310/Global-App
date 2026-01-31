@@ -138,6 +138,7 @@ export interface Database {
           content: string | null;
           image_url: string | null;
           is_pinned: boolean;
+          show_in_feed: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -149,6 +150,7 @@ export interface Database {
           content?: string | null;
           image_url?: string | null;
           is_pinned?: boolean;
+          show_in_feed?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -160,6 +162,7 @@ export interface Database {
           content?: string | null;
           image_url?: string | null;
           is_pinned?: boolean;
+          show_in_feed?: boolean;
           created_at?: string;
           updated_at?: string;
         };

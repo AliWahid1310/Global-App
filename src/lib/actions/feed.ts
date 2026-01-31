@@ -129,7 +129,7 @@ export async function getFeedItems(page: number = 0): Promise<FeedResponse> {
 
   const eventsData = (eventsRaw || []) as unknown as EventRow[];
 
-  // Fetch announcements/posts from ALL societies in user's university
+  // Fetch announcements/posts from ALL societies in user's university (only those marked for feed)
   const { data: postsRaw } = await supabase
     .from("posts")
     .select(`
@@ -150,6 +150,7 @@ export async function getFeedItems(page: number = 0): Promise<FeedResponse> {
       )
     `)
     .eq("society.university", profile.university)
+    .eq("show_in_feed", true)
     .order("created_at", { ascending: false });
 
   const postsData = (postsRaw || []) as unknown as PostRow[];
