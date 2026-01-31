@@ -13,6 +13,8 @@ CREATE TABLE society_positions (
     hierarchy_level hierarchy_level NOT NULL,
     display_order INTEGER DEFAULT 0,
     custom_title TEXT, -- Optional custom title (e.g., "Director of Marketing")
+    tenure_start DATE, -- When the person started this role
+    tenure_end DATE, -- When tenure ends (NULL means "Present")
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     UNIQUE(society_id, user_id, hierarchy_level) -- Prevent duplicate positions

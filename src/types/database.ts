@@ -386,6 +386,8 @@ export interface Database {
           hierarchy_level: HierarchyLevel;
           display_order: number;
           custom_title: string | null;
+          tenure_start: string | null;
+          tenure_end: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -397,6 +399,8 @@ export interface Database {
           hierarchy_level: HierarchyLevel;
           display_order?: number;
           custom_title?: string | null;
+          tenure_start?: string | null;
+          tenure_end?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -408,6 +412,8 @@ export interface Database {
           hierarchy_level?: HierarchyLevel;
           display_order?: number;
           custom_title?: string | null;
+          tenure_start?: string | null;
+          tenure_end?: string | null;
           created_at?: string;
           updated_at?: string;
         };

@@ -5,8 +5,9 @@ import { isPlatformAdmin } from "@/lib/auth/roles";
 import { MembershipSection } from "@/components/society/MembershipSection";
 import { PostManager } from "@/components/society/PostManager";
 import { EventManager } from "@/components/society/EventManager";
-import { ArrowLeft, Users, FileText, Calendar, Settings, ExternalLink, Shield } from "lucide-react";
-import type { Society, SocietyMember, Profile, Post, Event } from "@/types/database";
+import { LeadershipManager } from "@/components/society/LeadershipManager";
+import { ArrowLeft, Users, FileText, Calendar, Settings, ExternalLink, Shield, Crown } from "lucide-react";
+import type { Society, SocietyMember, Profile, Post, Event, SocietyPositionWithUser } from "@/types/database";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -112,6 +113,19 @@ export default async function ManageSocietyPage({ params }: Props) {
 
   const events = (eventsData || []) as Event[];
 
+  // Fetch leadership positions
+  const { data: positionsData } = await supabase
+    .from("society_positions")
+    .select(`
+      *,
+      user:profiles(*)
+    `)
+    .eq("society_id", society.id)
+    .order("hierarchy_level", { ascending: true })
+    .order("display_order", { ascending: true });
+
+  const positions = (positionsData || []) as SocietyPositionWithUser[];
+
   return (
     <div className="bg-dark-950 min-h-screen pt-24 pb-8 relative">
       <div className="absolute inset-0 bg-gradient-radial from-accent-900/10 via-transparent to-transparent" />
@@ -166,6 +180,15 @@ export default async function ManageSocietyPage({ params }: Props) {
                 </h2>
               </div>
               <PostManager societyId={society.id} posts={posts} />
+            </section>
+
+            {/* Leadership Section */}
+            <section className="glass-light rounded-2xl p-6">
+              <LeadershipManager 
+                societyId={society.id}
+                societySlug={society.slug}
+                positions={positions}
+              />
             </section>
           </div>
 

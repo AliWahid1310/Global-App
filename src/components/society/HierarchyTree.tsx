@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { User, Crown, Star, Briefcase, Users2, UserCircle } from "lucide-react";
+import { format } from "date-fns";
 import type { SocietyPositionWithUser, HierarchyLevel } from "@/types/database";
 
 interface HierarchyTreeProps {
@@ -52,10 +53,20 @@ const levelConfig: Record<HierarchyLevel, {
   },
 };
 
+function formatTenure(start: string | null, end: string | null): string {
+  if (!start) return "";
+  
+  const startDate = format(new Date(start), "MMM yyyy");
+  const endDate = end ? format(new Date(end), "MMM yyyy") : "Present";
+  
+  return `${startDate} - ${endDate}`;
+}
+
 function PositionCard({ position }: { position: SocietyPositionWithUser }) {
   const config = levelConfig[position.hierarchy_level];
   const Icon = config.icon;
   const displayTitle = position.custom_title || config.label;
+  const tenure = formatTenure(position.tenure_start, position.tenure_end);
 
   return (
     <div className="relative group">
@@ -91,6 +102,13 @@ function PositionCard({ position }: { position: SocietyPositionWithUser }) {
           <h4 className="mt-3 text-sm font-semibold text-white text-center">
             {position.user?.full_name || "Vacant"}
           </h4>
+          
+          {/* Tenure */}
+          {tenure && (
+            <p className="text-xs text-dark-400 text-center mt-1">
+              {tenure}
+            </p>
+          )}
           
           {/* Position title if custom */}
           {position.custom_title && position.custom_title !== config.label && (

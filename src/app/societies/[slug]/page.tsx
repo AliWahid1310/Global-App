@@ -231,17 +231,6 @@ export default async function SocietyPage({ params }: Props) {
           </div>
         </div>
 
-        {/* Leadership Hierarchy Section */}
-        <section className="mb-12 animate-slide-up" style={{ animationDelay: "0.05s" }}>
-          <h2 className="text-2xl font-display font-bold text-white mb-8 flex items-center gap-2">
-            <Crown className="h-6 w-6 text-amber-400" />
-            Leadership
-          </h2>
-          <div className="glass rounded-3xl p-8">
-            <HierarchyTree positions={positions} />
-          </div>
-        </section>
-
         {/* Content Grid */}
         <div className="grid lg:grid-cols-3 gap-8 pb-16">
           {/* Main Content */}
@@ -357,6 +346,30 @@ export default async function SocietyPage({ params }: Props) {
             )}
           </div>
         </div>
+
+        {/* Leadership Hierarchy Section */}
+        {positions.length > 0 && (
+          <section className="pb-16 animate-slide-up" style={{ animationDelay: "0.3s" }}>
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-display font-bold text-white flex items-center gap-2">
+                <Crown className="h-6 w-6 text-amber-400" />
+                Leadership
+              </h2>
+              {membership?.role === "admin" && (
+                <Link
+                  href={`/dashboard/societies/${society.slug}/manage?tab=leadership`}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 rounded-xl text-sm font-medium transition-all"
+                >
+                  <Shield className="h-4 w-4" />
+                  Manage Leadership
+                </Link>
+              )}
+            </div>
+            <div className="glass rounded-3xl p-8">
+              <HierarchyTree positions={positions} />
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );
