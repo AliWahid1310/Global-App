@@ -6,6 +6,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { uploadToCloudinary } from "@/lib/cloudinary/upload";
 import { ImageUpload } from "@/components/ui/ImageUpload";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import type { Event } from "@/types/database";
 import { Plus, Loader2, Trash2, X, Calendar, MapPin, Users, Settings, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
@@ -36,6 +37,9 @@ export function EventManager({ societyId, events }: EventManagerProps) {
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [optimisticEvents, setOptimisticEvents] = useState<Event[]>([]);
   const [deletedIds, setDeletedIds] = useState<string[]>([]);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
   const prevEventsRef = useRef<Event[]>(events);
   const router = useRouter();
@@ -161,27 +165,41 @@ export function EventManager({ societyId, events }: EventManagerProps) {
   };
 
   const handleDelete = async (eventId: string) => {
-    if (!confirm("Are you sure you want to delete this event?")) return;
+    setEventToDelete(eventId);
+    setDeleteModalOpen(true);
+  };
 
+  const confirmDelete = async () => {
+    if (!eventToDelete) return;
+    
+    setDeleteLoading(true);
+    
     // Optimistic delete - hide immediately
-    setDeletedIds(prev => [...prev, eventId]);
+    setDeletedIds(prev => [...prev, eventToDelete]);
     
     try {
       const { error } = await supabase
         .from("events")
         .delete()
-        .eq("id", eventId);
+        .eq("id", eventToDelete);
 
       if (error) {
         // Revert on error
-        setDeletedIds(prev => prev.filter(id => id !== eventId));
+        setDeletedIds(prev => prev.filter(id => id !== eventToDelete));
+        console.error("Error deleting event:", error);
         throw error;
       }
-      startTransition(() => {
-        router.refresh();
-      });
+      
+      // Close modal
+      setDeleteModalOpen(false);
+      setEventToDelete(null);
+      
+      // Force refresh to sync with server
+      router.refresh();
     } catch (error) {
       console.error("Error deleting event:", error);
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -510,6 +528,22 @@ export function EventManager({ societyId, events }: EventManagerProps) {
           </p>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setEventToDelete(null);
+        }}
+        onConfirm={confirmDelete}
+        title="Delete Event"
+        message="Are you sure you want to delete this event? This action cannot be undone and all RSVPs will be lost."
+        confirmText="Delete Event"
+        cancelText="Cancel"
+        variant="danger"
+        loading={deleteLoading}
+      />
     </div>
   );
 }
