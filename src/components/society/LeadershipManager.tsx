@@ -160,6 +160,27 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
     setLoading(true);
     setError(null);
 
+    // Validate tenure dates are not in the future
+    const currentMonth = new Date().toISOString().substring(0, 7); // "2026-01"
+    
+    if (formData.tenureStart && formData.tenureStart > currentMonth) {
+      setError("Start date cannot be in the future. Please select a valid date.");
+      setLoading(false);
+      return;
+    }
+    
+    if (formData.tenureEnd && formData.tenureEnd > currentMonth) {
+      setError("End date cannot be in the future. Please select a valid date.");
+      setLoading(false);
+      return;
+    }
+    
+    if (formData.tenureStart && formData.tenureEnd && formData.tenureEnd < formData.tenureStart) {
+      setError("End date cannot be before start date.");
+      setLoading(false);
+      return;
+    }
+
     const selectedLevel = hierarchyLevels.find(l => l.value === formData.hierarchyLevel);
     const positionTitle = formData.customTitle || selectedLevel?.label || formData.hierarchyLevel;
 
@@ -357,11 +378,11 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
 
       {/* Add/Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={closeModal} />
-          <div className="relative glass border border-dark-600 rounded-3xl p-6 w-full max-w-md animate-scale-in shadow-2xl shadow-accent-500/10">
+          <div className="relative glass border border-dark-600 rounded-3xl w-full max-w-md animate-scale-in shadow-2xl shadow-accent-500/10 my-8 max-h-[calc(100vh-4rem)] flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between p-6 pb-4 border-b border-dark-700/50 flex-shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
                   <Crown className="h-5 w-5 text-amber-400" />
@@ -378,7 +399,7 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 pt-4 space-y-5">
               {error && (
                 <div className="flex items-start gap-3 bg-red-500/10 border border-red-500/20 px-4 py-3 rounded-xl">
                   <div className="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -467,6 +488,7 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
                     <input
                       type="month"
                       value={formData.tenureStart}
+                      max={new Date().toISOString().substring(0, 7)}
                       onChange={(e) => setFormData({ ...formData, tenureStart: e.target.value })}
                       className="w-full px-3 py-2.5 bg-dark-800/50 border border-dark-600 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent transition-all"
                     />
@@ -481,6 +503,8 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
                       <input
                         type="month"
                         value={formData.tenureEnd}
+                        max={new Date().toISOString().substring(0, 7)}
+                        min={formData.tenureStart || undefined}
                         onChange={(e) => setFormData({ ...formData, tenureEnd: e.target.value })}
                         className="w-full px-3 py-2.5 bg-dark-800/50 border border-dark-600 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent transition-all"
                       />
