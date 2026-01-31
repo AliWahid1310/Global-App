@@ -214,9 +214,6 @@ export default async function FeedPage() {
                   <Sparkles className="w-8 h-8 text-accent-400" />
                   Your Feed
                 </h1>
-                <p className="text-dark-400 mt-1">
-                  Updates from your societies at {profile?.university || "your campus"}
-                </p>
               </div>
             </div>
 

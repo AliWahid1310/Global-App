@@ -85,7 +85,6 @@ export function Feed({ initialItems, initialHasMore }: FeedProps) {
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white">Happening Now 🔥</h2>
-                <p className="text-sm text-dark-400">Events from your societies</p>
               </div>
             </div>
             <a
@@ -127,7 +126,6 @@ export function Feed({ initialItems, initialHasMore }: FeedProps) {
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white">Updates 📢</h2>
-                <p className="text-sm text-dark-400">Latest announcements</p>
               </div>
             </div>
           </div>
