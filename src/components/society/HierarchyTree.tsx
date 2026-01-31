@@ -74,9 +74,9 @@ function PositionCard({ position }: { position: SocietyPositionWithUser }) {
       <div className={`absolute -inset-1 bg-gradient-to-r ${config.gradient} rounded-2xl blur-lg opacity-0 group-hover:opacity-40 transition-opacity duration-500`} />
       
       {/* Card */}
-      <div className={`relative glass rounded-2xl p-5 border ${config.borderColor} hover:border-opacity-100 transition-all duration-300 hover:scale-105`}>
+      <div className={`relative glass rounded-2xl p-5 border ${config.borderColor} hover:border-opacity-100 transition-all duration-300 hover:scale-105 h-full`}>
         {/* Avatar */}
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center h-full">
           <div className={`relative w-20 h-20 rounded-full overflow-hidden ring-2 ring-offset-2 ring-offset-dark-900 ${config.borderColor} shadow-lg ${config.glow}`}>
             {position.user?.avatar_url ? (
               <Image
@@ -103,12 +103,10 @@ function PositionCard({ position }: { position: SocietyPositionWithUser }) {
             {position.user?.full_name || "Vacant"}
           </h4>
           
-          {/* Tenure */}
-          {tenure && (
-            <p className="text-xs text-dark-400 text-center mt-1">
-              {tenure}
-            </p>
-          )}
+          {/* Tenure - always show space for consistent height */}
+          <p className="text-xs text-dark-400 text-center mt-1 min-h-[1rem]">
+            {tenure || "\u00A0"}
+          </p>
           
           {/* Position title if custom */}
           {position.custom_title && position.custom_title !== config.label && (
