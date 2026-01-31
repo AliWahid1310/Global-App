@@ -271,44 +271,121 @@ export interface LeaderboardSociety {
   slug: string;
   logo_url: string | null;
   member_count: number;
+  post_count?: number;
+  event_count?: number;
+  score?: number;
+}
+
+export interface LeaderboardMember {
+  id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  society_count: number;
 }
 
 export async function getLeaderboard(university: string | null): Promise<{
   topSocieties: LeaderboardSociety[];
+  fastestGrowing: LeaderboardSociety[];
+  mostActive: LeaderboardMember[];
 }> {
   const supabase = await createClient();
 
-  // Get top societies by member count for this university
-  let query = supabase
+  // Get societies with member count, posts, and events for this university
+  let societyQuery = supabase
     .from("societies")
     .select(`
       id,
       name,
       slug,
       logo_url,
-      society_members!inner(user_id)
+      created_at,
+      society_members(user_id, joined_at),
+      posts(id, created_at),
+      events(id, created_at)
     `)
     .eq("approval_status", "approved");
 
   if (university) {
-    query = query.eq("university", university);
+    societyQuery = societyQuery.eq("university", university);
   }
 
-  const { data: societies } = await query;
+  const { data: societies } = await societyQuery;
 
-  // Count members and sort
-  const societiesWithCounts = (societies || []).map((s: any) => ({
-    id: s.id,
-    name: s.name,
-    slug: s.slug,
-    logo_url: s.logo_url,
-    member_count: Array.isArray(s.society_members) ? s.society_members.length : 0,
-  }));
+  const now = new Date();
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-  // Sort by member count descending
-  societiesWithCounts.sort((a, b) => b.member_count - a.member_count);
+  // Calculate engagement scores and growth
+  const societiesWithStats = (societies || []).map((s: any) => {
+    const members = Array.isArray(s.society_members) ? s.society_members : [];
+    const posts = Array.isArray(s.posts) ? s.posts : [];
+    const events = Array.isArray(s.events) ? s.events : [];
+    
+    // Recent activity (last 30 days)
+    const recentPosts = posts.filter((p: any) => new Date(p.created_at) > thirtyDaysAgo).length;
+    const recentEvents = events.filter((e: any) => new Date(e.created_at) > thirtyDaysAgo).length;
+    const recentMembers = members.filter((m: any) => m.joined_at && new Date(m.joined_at) > thirtyDaysAgo).length;
+    
+    // Engagement score = members + (posts * 2) + (events * 3) + (recent activity bonus)
+    const score = members.length + (posts.length * 2) + (events.length * 3) + (recentPosts * 5) + (recentEvents * 10);
+    
+    return {
+      id: s.id,
+      name: s.name,
+      slug: s.slug,
+      logo_url: s.logo_url,
+      member_count: members.length,
+      post_count: posts.length,
+      event_count: events.length,
+      score,
+      recent_members: recentMembers,
+    };
+  });
+
+  // Top societies by engagement score
+  const topSocieties = [...societiesWithStats]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5);
+
+  // Fastest growing (most new members in last 30 days)
+  const fastestGrowing = [...societiesWithStats]
+    .filter(s => s.recent_members > 0)
+    .sort((a, b) => b.recent_members - a.recent_members)
+    .slice(0, 3);
+
+  // Get most active members (by number of societies joined)
+  let memberQuery = supabase
+    .from("profiles")
+    .select(`
+      id,
+      full_name,
+      avatar_url,
+      society_members!inner(society_id, societies!inner(university))
+    `);
+
+  const { data: members } = await memberQuery;
+
+  const membersWithCounts = (members || [])
+    .map((m: any) => {
+      const societyMemberships = Array.isArray(m.society_members) ? m.society_members : [];
+      // Filter by university if specified
+      const relevantMemberships = university 
+        ? societyMemberships.filter((sm: any) => sm.societies?.university === university)
+        : societyMemberships;
+      
+      return {
+        id: m.id,
+        full_name: m.full_name,
+        avatar_url: m.avatar_url,
+        society_count: relevantMemberships.length,
+      };
+    })
+    .filter((m: any) => m.society_count > 0)
+    .sort((a: any, b: any) => b.society_count - a.society_count)
+    .slice(0, 3);
 
   return {
-    topSocieties: societiesWithCounts.slice(0, 5),
+    topSocieties,
+    fastestGrowing,
+    mostActive: membersWithCounts,
   };
 }

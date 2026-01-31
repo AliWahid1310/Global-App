@@ -7,10 +7,11 @@ import { Feed } from "@/components/feed/Feed";
 import { 
   Sparkles, 
   Users, 
-  Plus,
   Bell,
   Trophy,
   TrendingUp,
+  Flame,
+  Crown,
 } from "lucide-react";
 
 interface ProfileData {
@@ -60,62 +61,30 @@ export default async function FeedPage() {
     <div className="min-h-screen bg-dark-950 pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Left Sidebar - Profile & Societies */}
-          <div className="hidden lg:block space-y-6">
-            {/* User Card */}
-            <div className="glass rounded-3xl p-6 sticky top-28">
-              <div className="flex items-center gap-4 mb-6">
-                {profile?.avatar_url ? (
-                  <Image
-                    src={profile.avatar_url}
-                    alt={profile.full_name || "User"}
-                    width={48}
-                    height={48}
-                    className="rounded-2xl ring-2 ring-accent-500/30"
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-accent-500 to-accent-700 flex items-center justify-center">
-                    <span className="text-lg font-bold text-white">
-                      {profile?.full_name?.[0] || "U"}
-                    </span>
-                  </div>
-                )}
-                <div>
-                  <h3 className="font-semibold text-white">
-                    {profile?.full_name || "Welcome!"}
-                  </h3>
-                  <p className="text-sm text-dark-400">{profile?.university}</p>
-                </div>
+          {/* Left Sidebar - Leaderboard */}
+          <div className="hidden lg:block">
+            <div className="glass rounded-3xl p-5 sticky top-28 space-y-6">
+              {/* Header */}
+              <div className="flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-amber-400" />
+                <h3 className="font-semibold text-white">Leaderboard</h3>
               </div>
 
-              {/* Quick Stats */}
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                <div className="bg-dark-800/50 rounded-xl p-3 text-center">
-                  <p className="text-xl font-bold text-white">{societies?.length || 0}</p>
-                  <p className="text-xs text-dark-400">Societies</p>
-                </div>
-                <div className="bg-dark-800/50 rounded-xl p-3 text-center">
-                  <p className="text-xl font-bold text-white">{items.filter(i => i.type === "event").length}</p>
-                  <p className="text-xs text-dark-400">Events</p>
-                </div>
-              </div>
-
-              {/* Leaderboard */}
+              {/* Top Societies */}
               <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <Trophy className="w-4 h-4 text-amber-400" />
-                  <h4 className="text-sm font-medium text-dark-300">Top Societies</h4>
+                <div className="flex items-center gap-2 mb-3">
+                  <Flame className="w-4 h-4 text-orange-400" />
+                  <h4 className="text-xs font-medium text-dark-400 uppercase tracking-wide">Top This Month</h4>
                 </div>
-                
                 {leaderboard.topSocieties.length > 0 ? (
                   <div className="space-y-2">
                     {leaderboard.topSocieties.map((society, index) => (
                       <Link
                         key={society.id}
                         href={`/societies/${society.slug}`}
-                        className="flex items-center gap-3 p-2 rounded-xl hover:bg-dark-800/50 transition-colors group"
+                        className="flex items-center gap-2 p-2 rounded-xl hover:bg-dark-800/50 transition-colors group"
                       >
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
                           index === 0 ? "bg-amber-500/20 text-amber-400" :
                           index === 1 ? "bg-slate-400/20 text-slate-300" :
                           index === 2 ? "bg-orange-600/20 text-orange-400" :
@@ -127,42 +96,112 @@ export default async function FeedPage() {
                           <Image
                             src={society.logo_url}
                             alt={society.name}
-                            width={32}
-                            height={32}
+                            width={28}
+                            height={28}
                             className="rounded-lg"
                           />
                         ) : (
-                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-600 to-accent-800 flex items-center justify-center">
-                            <span className="text-xs font-bold text-white">
+                          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-accent-600 to-accent-800 flex items-center justify-center">
+                            <span className="text-[10px] font-bold text-white">
                               {society.name?.[0]}
                             </span>
                           </div>
                         )}
-                        <div className="flex-1 min-w-0">
-                          <span className="text-sm text-dark-300 group-hover:text-white transition-colors truncate block">
-                            {society.name}
-                          </span>
-                          <span className="text-xs text-dark-500 flex items-center gap-1">
-                            <Users className="w-3 h-3" />
-                            {society.member_count} members
-                          </span>
-                        </div>
+                        <span className="text-sm text-dark-300 group-hover:text-white transition-colors truncate flex-1">
+                          {society.name}
+                        </span>
                       </Link>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-4">
-                    <p className="text-sm text-dark-400 mb-3">No societies yet</p>
-                    <Link
-                      href="/societies"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-accent-600 hover:bg-accent-500 text-white text-sm font-medium rounded-xl transition-colors"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Browse Societies
-                    </Link>
-                  </div>
+                  <p className="text-sm text-dark-500 text-center py-2">No data yet</p>
                 )}
               </div>
+
+              {/* Fastest Growing */}
+              {leaderboard.fastestGrowing.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <TrendingUp className="w-4 h-4 text-green-400" />
+                    <h4 className="text-xs font-medium text-dark-400 uppercase tracking-wide">Fastest Growing</h4>
+                  </div>
+                  <div className="space-y-2">
+                    {leaderboard.fastestGrowing.map((society) => (
+                      <Link
+                        key={society.id}
+                        href={`/societies/${society.slug}`}
+                        className="flex items-center gap-2 p-2 rounded-xl hover:bg-dark-800/50 transition-colors group"
+                      >
+                        {society.logo_url ? (
+                          <Image
+                            src={society.logo_url}
+                            alt={society.name}
+                            width={28}
+                            height={28}
+                            className="rounded-lg"
+                          />
+                        ) : (
+                          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center">
+                            <span className="text-[10px] font-bold text-white">
+                              {society.name?.[0]}
+                            </span>
+                          </div>
+                        )}
+                        <span className="text-sm text-dark-300 group-hover:text-white transition-colors truncate flex-1">
+                          {society.name}
+                        </span>
+                        <span className="text-xs text-green-400">↑</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Most Active Members */}
+              {leaderboard.mostActive.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Crown className="w-4 h-4 text-purple-400" />
+                    <h4 className="text-xs font-medium text-dark-400 uppercase tracking-wide">Active Members</h4>
+                  </div>
+                  <div className="space-y-2">
+                    {leaderboard.mostActive.map((member, index) => (
+                      <div
+                        key={member.id}
+                        className="flex items-center gap-2 p-2 rounded-xl"
+                      >
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                          index === 0 ? "bg-purple-500/20 text-purple-400" :
+                          "bg-dark-700 text-dark-400"
+                        }`}>
+                          {index + 1}
+                        </div>
+                        {member.avatar_url ? (
+                          <Image
+                            src={member.avatar_url}
+                            alt={member.full_name || "Member"}
+                            width={28}
+                            height={28}
+                            className="rounded-full"
+                          />
+                        ) : (
+                          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center">
+                            <span className="text-[10px] font-bold text-white">
+                              {member.full_name?.[0] || "?"}
+                            </span>
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <span className="text-sm text-dark-300 truncate block">
+                            {member.full_name || "Anonymous"}
+                          </span>
+                          <span className="text-xs text-dark-500">{member.society_count} societies</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
