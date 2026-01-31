@@ -74,7 +74,7 @@ function PositionCard({ position }: { position: SocietyPositionWithUser }) {
       <div className={`absolute -inset-1 bg-gradient-to-r ${config.gradient} rounded-2xl blur-lg opacity-0 group-hover:opacity-40 transition-opacity duration-500`} />
       
       {/* Card */}
-      <div className={`relative glass rounded-2xl p-4 border ${config.borderColor} hover:border-opacity-100 transition-all duration-300 hover:scale-105`}>
+      <div className={`relative glass rounded-2xl p-5 border ${config.borderColor} hover:border-opacity-100 transition-all duration-300 hover:scale-105`}>
         {/* Avatar */}
         <div className="flex flex-col items-center">
           <div className={`relative w-20 h-20 rounded-full overflow-hidden ring-2 ring-offset-2 ring-offset-dark-900 ${config.borderColor} shadow-lg ${config.glow}`}>
@@ -92,9 +92,9 @@ function PositionCard({ position }: { position: SocietyPositionWithUser }) {
             )}
           </div>
           
-          {/* Role badge */}
-          <div className={`-mt-3 px-3 py-1 bg-gradient-to-r ${config.gradient} rounded-full flex items-center gap-1.5 shadow-lg ${config.glow}`}>
-            <Icon className="w-3 h-3 text-white" />
+          {/* Role badge - positioned below avatar with spacing */}
+          <div className={`mt-3 px-3 py-1.5 bg-gradient-to-r ${config.gradient} rounded-full flex items-center gap-1.5 shadow-lg ${config.glow}`}>
+            <Icon className="w-3.5 h-3.5 text-white" />
             <span className="text-xs font-semibold text-white whitespace-nowrap">{displayTitle}</span>
           </div>
           
