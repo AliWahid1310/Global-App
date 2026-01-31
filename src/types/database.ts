@@ -11,6 +11,7 @@ export type MemberRole = "member" | "moderator" | "admin";
 export type SocietyStatus = "pending" | "approved" | "rejected";
 export type RSVPStatus = "going" | "maybe" | "not_going" | "waitlist";
 export type CheckInMethod = "qr" | "manual" | "self";
+export type HierarchyLevel = "president" | "vice_president" | "executive" | "director" | "deputy_director";
 
 export interface Database {
   public: {
@@ -376,6 +377,41 @@ export interface Database {
           created_at?: string;
         };
       };
+      society_positions: {
+        Row: {
+          id: string;
+          society_id: string;
+          user_id: string | null;
+          position_title: string;
+          hierarchy_level: HierarchyLevel;
+          display_order: number;
+          custom_title: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          society_id: string;
+          user_id?: string | null;
+          position_title: string;
+          hierarchy_level: HierarchyLevel;
+          display_order?: number;
+          custom_title?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          society_id?: string;
+          user_id?: string | null;
+          position_title?: string;
+          hierarchy_level?: HierarchyLevel;
+          display_order?: number;
+          custom_title?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
     Views: {
       [_ in never]: never;
@@ -419,6 +455,7 @@ export type EventCheckin = Database["public"]["Tables"]["event_checkins"]["Row"]
 export type EventReminder = Database["public"]["Tables"]["event_reminders"]["Row"];
 export type ChatMessage = Database["public"]["Tables"]["chat_messages"]["Row"];
 export type PostLike = Database["public"]["Tables"]["post_likes"]["Row"];
+export type SocietyPosition = Database["public"]["Tables"]["society_positions"]["Row"];
 
 // Extended types with relations
 export type PostWithAuthor = Post & {
@@ -457,6 +494,10 @@ export type SocietyMemberWithProfile = SocietyMember & {
 };
 
 export type ChatMessageWithUser = ChatMessage & {
+  user: Profile | null;
+};
+
+export type SocietyPositionWithUser = SocietyPosition & {
   user: Profile | null;
 };
 

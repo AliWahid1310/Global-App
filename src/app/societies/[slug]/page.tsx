@@ -6,8 +6,9 @@ import { isPlatformAdmin } from "@/lib/auth/roles";
 import { PostCard } from "@/components/society/PostCard";
 import { EventCard } from "@/components/society/EventCard";
 import { JoinButton } from "@/components/society/JoinButton";
-import { Users, MapPin, Calendar, MessageCircle, Sparkles, ArrowRight, Shield, Award } from "lucide-react";
-import type { Society, Post, Event, Profile, SocietyMember } from "@/types/database";
+import { HierarchyTree } from "@/components/society/HierarchyTree";
+import { Users, MapPin, Calendar, MessageCircle, Sparkles, ArrowRight, Shield, Award, Crown } from "lucide-react";
+import type { Society, Post, Event, Profile, SocietyMember, SocietyPositionWithUser } from "@/types/database";
 
 type PostWithAuthor = Post & { author: Profile | null };
 
@@ -98,6 +99,19 @@ export default async function SocietyPage({ params }: Props) {
     .limit(4);
 
   const events = (eventsData || []) as Event[];
+
+  // Fetch society hierarchy/positions
+  const { data: positionsData } = await supabase
+    .from("society_positions")
+    .select(`
+      *,
+      user:profiles(*)
+    `)
+    .eq("society_id", society.id)
+    .order("hierarchy_level", { ascending: true })
+    .order("display_order", { ascending: true });
+
+  const positions = (positionsData || []) as SocietyPositionWithUser[];
 
   // Check current user's membership
   let membership: SocietyMember | null = null;
@@ -216,6 +230,17 @@ export default async function SocietyPage({ params }: Props) {
             </div>
           </div>
         </div>
+
+        {/* Leadership Hierarchy Section */}
+        <section className="mb-12 animate-slide-up" style={{ animationDelay: "0.05s" }}>
+          <h2 className="text-2xl font-display font-bold text-white mb-8 flex items-center gap-2">
+            <Crown className="h-6 w-6 text-amber-400" />
+            Leadership
+          </h2>
+          <div className="glass rounded-3xl p-8">
+            <HierarchyTree positions={positions} />
+          </div>
+        </section>
 
         {/* Content Grid */}
         <div className="grid lg:grid-cols-3 gap-8 pb-16">
