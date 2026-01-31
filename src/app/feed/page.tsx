@@ -74,7 +74,7 @@ export default async function FeedPage() {
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <Flame className="w-4 h-4 text-orange-400" />
-                  <h4 className="text-xs font-medium text-dark-400 uppercase tracking-wide">Top This Month</h4>
+                  <h4 className="text-xs font-semibold text-dark-200 uppercase tracking-wide">Top This Month</h4>
                 </div>
                 {leaderboard.topSocieties.length > 0 ? (
                   <div className="space-y-2">
@@ -88,7 +88,7 @@ export default async function FeedPage() {
                           index === 0 ? "bg-amber-500/20 text-amber-400" :
                           index === 1 ? "bg-slate-400/20 text-slate-300" :
                           index === 2 ? "bg-orange-600/20 text-orange-400" :
-                          "bg-dark-700 text-dark-400"
+                          "bg-dark-700 text-dark-300"
                         }`}>
                           {index + 1}
                         </div>
@@ -107,14 +107,14 @@ export default async function FeedPage() {
                             </span>
                           </div>
                         )}
-                        <span className="text-sm text-dark-300 group-hover:text-white transition-colors truncate flex-1">
+                        <span className="text-sm text-white group-hover:text-accent-400 transition-colors truncate flex-1">
                           {society.name}
                         </span>
                       </Link>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-dark-500 text-center py-2">No data yet</p>
+                  <p className="text-sm text-dark-400 text-center py-2">No societies yet</p>
                 )}
               </div>
 
@@ -123,7 +123,7 @@ export default async function FeedPage() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <TrendingUp className="w-4 h-4 text-green-400" />
-                    <h4 className="text-xs font-medium text-dark-400 uppercase tracking-wide">Fastest Growing</h4>
+                    <h4 className="text-xs font-semibold text-dark-200 uppercase tracking-wide">Most Members</h4>
                   </div>
                   <div className="space-y-2">
                     {leaderboard.fastestGrowing.map((society) => (
@@ -147,10 +147,10 @@ export default async function FeedPage() {
                             </span>
                           </div>
                         )}
-                        <span className="text-sm text-dark-300 group-hover:text-white transition-colors truncate flex-1">
+                        <span className="text-sm text-white group-hover:text-accent-400 transition-colors truncate flex-1">
                           {society.name}
                         </span>
-                        <span className="text-xs text-green-400">↑</span>
+                        <span className="text-xs text-green-400 font-medium">{society.member_count}</span>
                       </Link>
                     ))}
                   </div>
@@ -162,7 +162,7 @@ export default async function FeedPage() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Crown className="w-4 h-4 text-purple-400" />
-                    <h4 className="text-xs font-medium text-dark-400 uppercase tracking-wide">Active Members</h4>
+                    <h4 className="text-xs font-semibold text-dark-200 uppercase tracking-wide">Active Members</h4>
                   </div>
                   <div className="space-y-2">
                     {leaderboard.mostActive.map((member, index) => (
@@ -172,7 +172,8 @@ export default async function FeedPage() {
                       >
                         <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
                           index === 0 ? "bg-purple-500/20 text-purple-400" :
-                          "bg-dark-700 text-dark-400"
+                          index === 1 ? "bg-purple-500/10 text-purple-300" :
+                          "bg-dark-700 text-dark-300"
                         }`}>
                           {index + 1}
                         </div>
@@ -192,10 +193,10 @@ export default async function FeedPage() {
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <span className="text-sm text-dark-300 truncate block">
+                          <span className="text-sm text-white truncate block">
                             {member.full_name || "Anonymous"}
                           </span>
-                          <span className="text-xs text-dark-500">{member.society_count} societies</span>
+                          <span className="text-xs text-dark-300">{member.society_count} societies</span>
                         </div>
                       </div>
                     ))}
