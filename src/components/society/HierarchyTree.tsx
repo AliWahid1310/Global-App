@@ -107,13 +107,6 @@ function PositionCard({ position }: { position: SocietyPositionWithUser }) {
           <p className="text-xs text-dark-400 text-center mt-1 min-h-[1rem]">
             {tenure || "\u00A0"}
           </p>
-          
-          {/* Position title if custom */}
-          {position.custom_title && position.custom_title !== config.label && (
-            <p className="text-xs text-dark-300 text-center mt-0.5">
-              {position.position_title}
-            </p>
-          )}
         </div>
       </div>
     </div>

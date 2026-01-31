@@ -172,6 +172,13 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
     setLoading(true);
     setError(null);
 
+    // Validate: must have either a role level or custom title
+    if (!formData.hierarchyLevel && !formData.customTitle.trim()) {
+      setError("Please select a role level or enter a custom title.");
+      setLoading(false);
+      return;
+    }
+
     // Validate tenure dates are not in the future
     const currentMonth = new Date().toISOString().substring(0, 7); // "2026-01"
     
@@ -193,8 +200,31 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
       return;
     }
 
-    const selectedLevel = hierarchyLevels.find(l => l.value === formData.hierarchyLevel);
-    const positionTitle = formData.customTitle || selectedLevel?.label || formData.hierarchyLevel;
+    // Detect hierarchy level from custom title if no role level is selected
+    let hierarchyLevel: HierarchyLevel = formData.hierarchyLevel as HierarchyLevel;
+    
+    if (!formData.hierarchyLevel && formData.customTitle.trim()) {
+      const customLower = formData.customTitle.toLowerCase();
+      
+      // Check in order of specificity (more specific first)
+      if (customLower.includes("deputy director") || customLower.includes("deputy-director")) {
+        hierarchyLevel = "deputy_director";
+      } else if (customLower.includes("vice president") || customLower.includes("vice-president") || customLower.includes("vp")) {
+        hierarchyLevel = "vice_president";
+      } else if (customLower.includes("president")) {
+        hierarchyLevel = "president";
+      } else if (customLower.includes("director")) {
+        hierarchyLevel = "director";
+      } else if (customLower.includes("executive") || customLower.includes("exec")) {
+        hierarchyLevel = "executive";
+      } else {
+        // Default to executive for truly custom titles
+        hierarchyLevel = "executive";
+      }
+    }
+
+    const selectedLevel = hierarchyLevels.find(l => l.value === hierarchyLevel);
+    const positionTitle = formData.customTitle || selectedLevel?.label || hierarchyLevel;
 
     if (editingPosition) {
       // Update existing
@@ -203,7 +233,7 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
         societySlug,
         userId: formData.userId,
         positionTitle,
-        hierarchyLevel: formData.hierarchyLevel,
+        hierarchyLevel: hierarchyLevel as HierarchyLevel,
         customTitle: formData.customTitle || null,
         tenureStart: monthToDate(formData.tenureStart),
         tenureEnd: formData.isPresent ? null : monthToDate(formData.tenureEnd),
@@ -221,7 +251,7 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
         societySlug,
         userId: formData.userId,
         positionTitle,
-        hierarchyLevel: formData.hierarchyLevel,
+        hierarchyLevel: hierarchyLevel as HierarchyLevel,
         customTitle: formData.customTitle || null,
         tenureStart: monthToDate(formData.tenureStart),
         tenureEnd: formData.isPresent ? null : monthToDate(formData.tenureEnd),
@@ -424,7 +454,7 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
               {/* Hierarchy Level */}
               <div>
                 <label className="block text-sm font-medium text-dark-100 mb-3">
-                  Role Level <span className="text-red-400">*</span>
+                  Role Level <span className="text-dark-500">(select one or use custom title)</span>
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   {hierarchyLevels.map((level) => {
@@ -434,7 +464,10 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
                       <button
                         key={level.value}
                         type="button"
-                        onClick={() => setFormData({ ...formData, hierarchyLevel: level.value })}
+                        onClick={() => setFormData({ 
+                          ...formData, 
+                          hierarchyLevel: isSelected ? "" as HierarchyLevel : level.value 
+                        })}
                         className={`flex items-center gap-2 p-3 rounded-xl border transition-all ${
                           isSelected
                             ? `bg-gradient-to-r ${levelColors[level.value]} border-transparent text-white shadow-lg`
