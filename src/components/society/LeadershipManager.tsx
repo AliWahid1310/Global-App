@@ -110,6 +110,18 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
   const [error, setError] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isModalOpen]);
+
   // Load members when modal opens
   useEffect(() => {
     if (isModalOpen && members.length === 0) {
@@ -378,7 +390,7 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
 
       {/* Add/Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-24 pb-8 px-4 overflow-y-auto">
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-24 pb-8 px-4 overflow-y-auto scroll-smooth overscroll-contain">
           <div className="fixed inset-0 bg-black/80 backdrop-blur-md" onClick={closeModal} />
           <div className="relative glass border border-dark-600 rounded-3xl w-full max-w-md animate-scale-in shadow-2xl shadow-accent-500/10 max-h-[calc(100vh-8rem)] flex flex-col">
             {/* Header */}
@@ -399,7 +411,7 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 pt-4 space-y-5">
+            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto scroll-smooth overscroll-contain p-6 pt-4 space-y-5">
               {error && (
                 <div className="flex items-start gap-3 bg-red-500/10 border border-red-500/20 px-4 py-3 rounded-xl">
                   <div className="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
