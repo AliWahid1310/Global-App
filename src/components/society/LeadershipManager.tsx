@@ -378,9 +378,9 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
 
       {/* Add/Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={closeModal} />
-          <div className="relative glass border border-dark-600 rounded-3xl w-full max-w-md animate-scale-in shadow-2xl shadow-accent-500/10 my-8 max-h-[calc(100vh-4rem)] flex flex-col">
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-24 pb-8 px-4 overflow-y-auto">
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-md" onClick={closeModal} />
+          <div className="relative glass border border-dark-600 rounded-3xl w-full max-w-md animate-scale-in shadow-2xl shadow-accent-500/10 max-h-[calc(100vh-8rem)] flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between p-6 pb-4 border-b border-dark-700/50 flex-shrink-0">
               <div className="flex items-center gap-3">
