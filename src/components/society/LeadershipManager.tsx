@@ -464,11 +464,11 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
                   <select
                     value={formData.userId || ""}
                     onChange={(e) => setFormData({ ...formData, userId: e.target.value || null })}
-                    className="w-full px-4 py-3 bg-dark-800/50 border border-dark-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent transition-all appearance-none cursor-pointer"
+                    className="w-full px-4 py-3 bg-white border border-dark-600 rounded-xl text-dark-900 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent transition-all appearance-none cursor-pointer"
                   >
-                    <option value="">Leave vacant</option>
+                    <option value="" className="bg-white text-dark-900">Leave vacant</option>
                     {members.map((member) => (
-                      <option key={member.id} value={member.id}>
+                      <option key={member.id} value={member.id} className="bg-white text-dark-900">
                         {member.full_name || "Unknown Member"}
                       </option>
                     ))}
