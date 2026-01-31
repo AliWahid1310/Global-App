@@ -2,13 +2,15 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
-import { getFeedItems, getUserSocieties } from "@/lib/actions/feed";
+import { getFeedItems, getUserSocieties, getLeaderboard } from "@/lib/actions/feed";
 import { Feed } from "@/components/feed/Feed";
 import { 
   Sparkles, 
   Users, 
   Plus,
   Bell,
+  Trophy,
+  TrendingUp,
 } from "lucide-react";
 
 interface ProfileData {
@@ -50,6 +52,9 @@ export default async function FeedPage() {
 
   // Get user's societies for the sidebar
   const societies = await getUserSocieties() as SocietyData[];
+
+  // Get leaderboard data
+  const leaderboard = await getLeaderboard(profile?.university || null);
 
   return (
     <div className="min-h-screen bg-dark-950 pt-20">
@@ -95,26 +100,29 @@ export default async function FeedPage() {
                 </div>
               </div>
 
-              {/* My Societies */}
+              {/* Leaderboard */}
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-sm font-medium text-dark-300">My Societies</h4>
-                  <Link
-                    href="/societies"
-                    className="text-xs text-accent-400 hover:text-accent-300 transition-colors"
-                  >
-                    Browse all
-                  </Link>
+                <div className="flex items-center gap-2 mb-4">
+                  <Trophy className="w-4 h-4 text-amber-400" />
+                  <h4 className="text-sm font-medium text-dark-300">Top Societies</h4>
                 </div>
                 
-                {societies && societies.length > 0 ? (
+                {leaderboard.topSocieties.length > 0 ? (
                   <div className="space-y-2">
-                    {societies.slice(0, 5).map((society: SocietyData) => (
+                    {leaderboard.topSocieties.map((society, index) => (
                       <Link
                         key={society.id}
                         href={`/societies/${society.slug}`}
                         className="flex items-center gap-3 p-2 rounded-xl hover:bg-dark-800/50 transition-colors group"
                       >
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                          index === 0 ? "bg-amber-500/20 text-amber-400" :
+                          index === 1 ? "bg-slate-400/20 text-slate-300" :
+                          index === 2 ? "bg-orange-600/20 text-orange-400" :
+                          "bg-dark-700 text-dark-400"
+                        }`}>
+                          {index + 1}
+                        </div>
                         {society.logo_url ? (
                           <Image
                             src={society.logo_url}
@@ -130,19 +138,17 @@ export default async function FeedPage() {
                             </span>
                           </div>
                         )}
-                        <span className="text-sm text-dark-300 group-hover:text-white transition-colors truncate">
-                          {society.name}
-                        </span>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-sm text-dark-300 group-hover:text-white transition-colors truncate block">
+                            {society.name}
+                          </span>
+                          <span className="text-xs text-dark-500 flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            {society.member_count} members
+                          </span>
+                        </div>
                       </Link>
                     ))}
-                    {societies.length > 5 && (
-                      <Link
-                        href="/dashboard"
-                        className="block text-center text-xs text-dark-400 hover:text-accent-400 py-2"
-                      >
-                        +{societies.length - 5} more
-                      </Link>
-                    )}
                   </div>
                 ) : (
                   <div className="text-center py-4">
@@ -152,7 +158,7 @@ export default async function FeedPage() {
                       className="inline-flex items-center gap-2 px-4 py-2 bg-accent-600 hover:bg-accent-500 text-white text-sm font-medium rounded-xl transition-colors"
                     >
                       <Plus className="w-4 h-4" />
-                      Join Societies
+                      Browse Societies
                     </Link>
                   </div>
                 )}

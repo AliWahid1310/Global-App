@@ -264,3 +264,51 @@ export async function getUserSocieties(): Promise<SocietyRow[]> {
   const result = (memberships || []) as unknown as { society: SocietyRow }[];
   return result.map((m) => m.society);
 }
+
+export interface LeaderboardSociety {
+  id: string;
+  name: string;
+  slug: string;
+  logo_url: string | null;
+  member_count: number;
+}
+
+export async function getLeaderboard(university: string | null): Promise<{
+  topSocieties: LeaderboardSociety[];
+}> {
+  const supabase = await createClient();
+
+  // Get top societies by member count for this university
+  let query = supabase
+    .from("societies")
+    .select(`
+      id,
+      name,
+      slug,
+      logo_url,
+      society_members!inner(user_id)
+    `)
+    .eq("approval_status", "approved");
+
+  if (university) {
+    query = query.eq("university", university);
+  }
+
+  const { data: societies } = await query;
+
+  // Count members and sort
+  const societiesWithCounts = (societies || []).map((s: any) => ({
+    id: s.id,
+    name: s.name,
+    slug: s.slug,
+    logo_url: s.logo_url,
+    member_count: Array.isArray(s.society_members) ? s.society_members.length : 0,
+  }));
+
+  // Sort by member count descending
+  societiesWithCounts.sort((a, b) => b.member_count - a.member_count);
+
+  return {
+    topSocieties: societiesWithCounts.slice(0, 5),
+  };
+}
