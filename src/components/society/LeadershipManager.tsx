@@ -472,7 +472,8 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
                         type="button"
                         onClick={() => setFormData({ 
                           ...formData, 
-                          hierarchyLevel: isSelected ? "" as HierarchyLevel : level.value 
+                          hierarchyLevel: isSelected ? "" as HierarchyLevel : level.value,
+                          customTitle: "" // Clear custom title when selecting a role level
                         })}
                         className={`flex items-center gap-2 p-3 rounded-xl border transition-all ${
                           isSelected
@@ -496,6 +497,7 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
                 <input
                   type="text"
                   value={formData.customTitle}
+                  onFocus={() => setFormData({ ...formData, hierarchyLevel: "" as HierarchyLevel })}
                   onChange={(e) => setFormData({ ...formData, customTitle: e.target.value })}
                   placeholder={`e.g., Director of Marketing`}
                   className="w-full px-4 py-3 bg-dark-800/50 border border-dark-600 rounded-xl text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent transition-all"
