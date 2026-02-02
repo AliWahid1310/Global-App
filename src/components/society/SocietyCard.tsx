@@ -22,13 +22,13 @@ export function SocietyCard({ society, memberCount }: SocietyCardProps) {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`relative rounded-3xl overflow-hidden transition-all duration-500 card-tilt ${
+        className={`relative rounded-3xl transition-all duration-500 card-tilt transform-gpu ${
           isHovered ? "scale-[1.02]" : ""
         }`}
       >
         {/* Glow effect */}
         <div
-          className={`absolute -inset-1 bg-gradient-to-r from-accent-500/50 to-glow/50 rounded-3xl blur-xl transition-opacity duration-500 ${
+          className={`absolute -inset-1 bg-gradient-to-r from-accent-500/50 to-glow/50 rounded-3xl blur-xl transition-opacity duration-500 pointer-events-none ${
             isHovered ? "opacity-60" : "opacity-0"
           }`}
         />
