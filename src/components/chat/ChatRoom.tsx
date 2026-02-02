@@ -183,8 +183,8 @@ export function ChatRoom({
                     >
                       {showAvatar && (
                         <p
-                          className={`text-xs text-dark-400 mb-1.5 font-medium ${
-                            isOwnMessage ? "text-right" : "text-left"
+                          className={`text-xs mb-1.5 font-medium ${
+                            isOwnMessage ? "text-dark-400 text-right" : "text-accent-400 text-left"
                           }`}
                         >
                           {message.user?.full_name || "Unknown User"}
@@ -194,7 +194,7 @@ export function ChatRoom({
                         className={`px-4 py-2.5 rounded-2xl ${
                           isOwnMessage
                             ? "bg-gradient-to-r from-accent-600 to-accent-500 text-white rounded-br-md shadow-lg shadow-accent-500/20"
-                            : "bg-dark-800 border border-dark-700 text-dark-100 rounded-bl-md"
+                            : "bg-dark-700 border border-dark-600 text-white rounded-bl-md"
                         }`}
                       >
                         <p className="text-sm whitespace-pre-wrap break-words">
