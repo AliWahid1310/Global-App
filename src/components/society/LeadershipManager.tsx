@@ -58,7 +58,7 @@ const levelColors: Record<HierarchyLevel, string> = {
 interface PositionFormData {
   userId: string | null;
   positionTitle: string;
-  hierarchyLevel: HierarchyLevel | "";
+  hierarchyLevel: HierarchyLevel;
   customTitle: string;
   tenureStart: string;
   tenureEnd: string;
@@ -68,7 +68,7 @@ interface PositionFormData {
 const initialFormData: PositionFormData = {
   userId: null,
   positionTitle: "",
-  hierarchyLevel: "",
+  hierarchyLevel: "president",
   customTitle: "",
   tenureStart: "",
   tenureEnd: "",
@@ -103,7 +103,6 @@ function getUserFriendlyError(error: string): string {
 
 export function LeadershipManager({ societyId, societySlug, positions }: LeadershipManagerProps) {
   const router = useRouter();
-  const [localPositions, setLocalPositions] = useState<SocietyPositionWithUser[]>(positions);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPosition, setEditingPosition] = useState<SocietyPositionWithUser | null>(null);
   const [formData, setFormData] = useState<PositionFormData>(initialFormData);
@@ -112,11 +111,6 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
   const [loadingMembers, setLoadingMembers] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-
-  // Sync local positions when props change
-  useEffect(() => {
-    setLocalPositions(positions);
-  }, [positions]);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -135,7 +129,6 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
     if (isModalOpen && members.length === 0) {
       loadMembers();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isModalOpen]);
 
   const loadMembers = async () => {
@@ -210,11 +203,9 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
     }
 
     // Detect hierarchy level from custom title if no role level is selected
-    let hierarchyLevel: HierarchyLevel = "executive"; // Default fallback
+    let hierarchyLevel: HierarchyLevel = formData.hierarchyLevel as HierarchyLevel;
     
-    if (formData.hierarchyLevel) {
-      hierarchyLevel = formData.hierarchyLevel;
-    } else if (formData.customTitle.trim()) {
+    if (!formData.hierarchyLevel && formData.customTitle.trim()) {
       const customLower = formData.customTitle.toLowerCase();
       
       // Check in order of specificity (more specific first)
@@ -228,15 +219,14 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
         hierarchyLevel = "director";
       } else if (customLower.includes("executive") || customLower.includes("exec")) {
         hierarchyLevel = "executive";
+      } else {
+        // Default to executive for truly custom titles
+        hierarchyLevel = "executive";
       }
-      // else: keep default "executive"
     }
 
     const selectedLevel = hierarchyLevels.find(l => l.value === hierarchyLevel);
     const positionTitle = formData.customTitle || selectedLevel?.label || hierarchyLevel;
-
-    // Get selected member for optimistic update
-    const selectedMember = members.find(m => m.id === formData.userId);
 
     if (editingPosition) {
       // Update existing
@@ -245,7 +235,7 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
         societySlug,
         userId: formData.userId,
         positionTitle,
-        hierarchyLevel,
+        hierarchyLevel: hierarchyLevel as HierarchyLevel,
         customTitle: formData.customTitle || null,
         tenureStart: monthToDate(formData.tenureStart),
         tenureEnd: formData.isPresent ? null : monthToDate(formData.tenureEnd),
@@ -253,28 +243,10 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
 
       if (result.error) {
         setError(getUserFriendlyError(result.error));
-        setLoading(false);
-        return;
+      } else {
+        closeModal();
+        router.refresh();
       }
-
-      // Update local state optimistically after success
-      const updatedPosition: SocietyPositionWithUser = {
-        ...editingPosition,
-        user_id: formData.userId,
-        position_title: positionTitle,
-        hierarchy_level: hierarchyLevel,
-        custom_title: formData.customTitle || null,
-        tenure_start: monthToDate(formData.tenureStart),
-        tenure_end: formData.isPresent ? null : monthToDate(formData.tenureEnd),
-        user: selectedMember ? {
-          id: selectedMember.id,
-          full_name: selectedMember.full_name,
-          avatar_url: selectedMember.avatar_url,
-        } as any : null,
-      };
-      setLocalPositions(prev => prev.map(p => p.id === editingPosition.id ? updatedPosition : p));
-      closeModal();
-      router.refresh();
     } else {
       // Add new
       const result = await addLeadershipPosition({
@@ -282,7 +254,7 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
         societySlug,
         userId: formData.userId,
         positionTitle,
-        hierarchyLevel,
+        hierarchyLevel: hierarchyLevel as HierarchyLevel,
         customTitle: formData.customTitle || null,
         tenureStart: monthToDate(formData.tenureStart),
         tenureEnd: formData.isPresent ? null : monthToDate(formData.tenureEnd),
@@ -290,54 +262,25 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
 
       if (result.error) {
         setError(getUserFriendlyError(result.error));
-        setLoading(false);
-        return;
+      } else {
+        closeModal();
+        router.refresh();
       }
-
-      // Add to local state after success
-      const tempId = `temp-${Date.now()}`;
-      const newPosition: SocietyPositionWithUser = {
-        id: tempId,
-        society_id: societyId,
-        user_id: formData.userId,
-        position_title: positionTitle,
-        hierarchy_level: hierarchyLevel,
-        custom_title: formData.customTitle || null,
-        tenure_start: monthToDate(formData.tenureStart),
-        tenure_end: formData.isPresent ? null : monthToDate(formData.tenureEnd),
-        display_order: 0,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        user: selectedMember ? {
-          id: selectedMember.id,
-          full_name: selectedMember.full_name,
-          avatar_url: selectedMember.avatar_url,
-        } as any : null,
-      };
-      setLocalPositions(prev => [...prev, newPosition]);
-      closeModal();
-      router.refresh();
     }
 
     setLoading(false);
   };
 
   const handleDelete = async (positionId: string) => {
-    // Optimistic delete
-    const positionToDelete = localPositions.find(p => p.id === positionId);
-    setLocalPositions(prev => prev.filter(p => p.id !== positionId));
-    setDeleteConfirm(null);
-
+    setLoading(true);
     const result = await deleteLeadershipPosition(positionId, societySlug);
     if (result.error) {
-      // Revert on error
-      if (positionToDelete) {
-        setLocalPositions(prev => [...prev, positionToDelete]);
-      }
       setError(result.error);
     } else {
       router.refresh();
     }
+    setDeleteConfirm(null);
+    setLoading(false);
   };
 
   const getLevelIcon = (level: HierarchyLevel) => {
@@ -345,10 +288,10 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
     return config?.icon || Crown;
   };
 
-  // Group positions by hierarchy level (use localPositions for optimistic updates)
+  // Group positions by hierarchy level
   const groupedPositions = hierarchyLevels.map(level => ({
     ...level,
-    positions: localPositions.filter(p => p.hierarchy_level === level.value),
+    positions: positions.filter(p => p.hierarchy_level === level.value),
   })).filter(group => group.positions.length > 0);
 
   return (
@@ -374,7 +317,7 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
       </div>
 
       {/* Positions List */}
-      {localPositions.length === 0 ? (
+      {positions.length === 0 ? (
         <div className="glass-light rounded-2xl p-10 text-center">
           <div className="w-16 h-16 bg-dark-700 rounded-full flex items-center justify-center mx-auto mb-4">
             <Crown className="h-8 w-8 text-dark-400" />
@@ -483,9 +426,9 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
 
       {/* Add/Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-24 pb-8 px-4 overflow-y-auto overscroll-contain">
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={closeModal} />
-          <div className="relative glass border border-dark-600 rounded-3xl w-full max-w-md animate-scale-in shadow-2xl shadow-accent-500/10 max-h-[calc(100vh-8rem)] flex flex-col transform-gpu will-change-transform">
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-24 pb-8 px-4 overflow-y-auto scroll-smooth overscroll-contain">
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-md" onClick={closeModal} />
+          <div className="relative glass border border-dark-600 rounded-3xl w-full max-w-md animate-scale-in shadow-2xl shadow-accent-500/10 max-h-[calc(100vh-8rem)] flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between p-6 pb-4 border-b border-dark-700/50 flex-shrink-0">
               <div className="flex items-center gap-3">
@@ -504,7 +447,7 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto overscroll-contain p-6 pt-4 space-y-5">
+            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto scroll-smooth overscroll-contain p-6 pt-4 space-y-5">
               {error && (
                 <div className="flex items-start gap-3 bg-red-500/10 border border-red-500/20 px-4 py-3 rounded-xl">
                   <div className="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -529,10 +472,10 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
                         type="button"
                         onClick={() => setFormData({ 
                           ...formData, 
-                          hierarchyLevel: isSelected ? "" : level.value,
+                          hierarchyLevel: isSelected ? "" as HierarchyLevel : level.value,
                           customTitle: "" // Clear custom title when selecting a role level
                         })}
-                        className={`flex items-center gap-2 p-3 rounded-xl border transition-colors duration-150 transform-gpu active:scale-95 ${
+                        className={`flex items-center gap-2 p-3 rounded-xl border transition-all ${
                           isSelected
                             ? `bg-gradient-to-r ${levelColors[level.value]} border-transparent text-white shadow-lg`
                             : "border-dark-600 bg-dark-800/50 text-dark-300 hover:border-dark-500 hover:text-white hover:bg-dark-800"
@@ -554,7 +497,7 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
                 <input
                   type="text"
                   value={formData.customTitle}
-                  onFocus={() => setFormData({ ...formData, hierarchyLevel: "" })}
+                  onFocus={() => setFormData({ ...formData, hierarchyLevel: "" as HierarchyLevel })}
                   onChange={(e) => setFormData({ ...formData, customTitle: e.target.value })}
                   placeholder={`e.g., Director of Marketing`}
                   className="w-full px-4 py-3 bg-dark-800/50 border border-dark-600 rounded-xl text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent transition-all"
