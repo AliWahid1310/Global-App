@@ -131,9 +131,17 @@ export function ChatRoom({
           <div className="space-y-4">
             {messages.map((message, index) => {
               const prevMessage = index > 0 ? messages[index - 1] : null;
+              const nextMessage = index < messages.length - 1 ? messages[index + 1] : null;
               const isOwnMessage = message.user_id === currentUser.id;
               const showAvatar =
                 !prevMessage || prevMessage.user_id !== message.user_id;
+              
+              // Only show timestamp if next message is from different user OR has different time
+              const currentTime = formatMessageDate(message.created_at);
+              const nextTime = nextMessage ? formatMessageDate(nextMessage.created_at) : null;
+              const isNextSameUser = nextMessage && nextMessage.user_id === message.user_id;
+              const isNextSameTime = nextTime === currentTime;
+              const showTimestamp = !nextMessage || !isNextSameUser || !isNextSameTime;
 
               return (
                 <div key={message.id} className="animate-message-float">
@@ -193,13 +201,15 @@ export function ChatRoom({
                           {message.content}
                         </p>
                       </div>
-                      <p
-                        className={`text-xs text-dark-500 mt-1.5 ${
-                          isOwnMessage ? "text-right" : "text-left"
-                        }`}
-                      >
-                        {formatMessageDate(message.created_at)}
-                      </p>
+                      {showTimestamp && (
+                        <p
+                          className={`text-xs text-dark-500 mt-1.5 ${
+                            isOwnMessage ? "text-right" : "text-left"
+                          }`}
+                        >
+                          {formatMessageDate(message.created_at)}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
