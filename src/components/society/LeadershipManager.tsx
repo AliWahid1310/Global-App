@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { 
   Crown, 
@@ -101,6 +102,7 @@ function getUserFriendlyError(error: string): string {
 }
 
 export function LeadershipManager({ societyId, societySlug, positions }: LeadershipManagerProps) {
+  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPosition, setEditingPosition] = useState<SocietyPositionWithUser | null>(null);
   const [formData, setFormData] = useState<PositionFormData>(initialFormData);
@@ -243,6 +245,7 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
         setError(getUserFriendlyError(result.error));
       } else {
         closeModal();
+        router.refresh();
       }
     } else {
       // Add new
@@ -261,6 +264,7 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
         setError(getUserFriendlyError(result.error));
       } else {
         closeModal();
+        router.refresh();
       }
     }
 
@@ -272,6 +276,8 @@ export function LeadershipManager({ societyId, societySlug, positions }: Leaders
     const result = await deleteLeadershipPosition(positionId, societySlug);
     if (result.error) {
       setError(result.error);
+    } else {
+      router.refresh();
     }
     setDeleteConfirm(null);
     setLoading(false);
