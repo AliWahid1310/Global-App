@@ -58,14 +58,18 @@ export default async function FeedPage() {
   // Get leaderboard data
   const leaderboard = await getLeaderboard(profile?.university || null);
 
-  // Check if user already applied to Canva community
-  const { data: existingApplication } = await supabase
-    .from("canva_applications")
-    .select("id")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  const alreadyApplied = !!existingApplication;
+  // Check if user already applied to Canva community (safe fallback if table missing)
+  let alreadyApplied = false;
+  try {
+    const { data: existingApplication } = await supabase
+      .from("canva_applications")
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    alreadyApplied = !!existingApplication;
+  } catch {
+    alreadyApplied = false;
+  }
 
   return (
     <div className="min-h-screen bg-dark-950 pt-20">
