@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   Loader2,
   ChevronRight,
+  AlertTriangle,
 } from "lucide-react";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -107,6 +108,63 @@ function ApplicationForm({ userId }: { userId: string }) {
     return null;
   }
 
+  function validateStep(currentStep: number): string | null {
+    if (currentStep === 1) {
+      if (!fullName.trim()) return "Full Name is required";
+      if (!email.trim()) return "University Email is required";
+      if (!phone.trim()) return "Phone Number is required";
+      if (!department) return "Department is required";
+      if (department === "Other" && !otherDepartment.trim()) return "Please enter your department";
+      if (!semester.trim()) return "Current Semester is required";
+      if (!campus) return "Campus is required";
+    }
+    if (currentStep === 2) {
+      if (volunteered === null) return "Please indicate volunteering experience";
+      if (memberOfOrg === null) return "Please indicate society membership";
+      if (!usedCanva) return "Please indicate your Canva experience";
+    }
+    if (currentStep === 3) {
+      if (roles.length === 0) return "Please select at least one role";
+      if (!experience.trim()) return "Please describe your experience";
+    }
+    if (currentStep === 4) {
+      if (!whyJoin.trim()) return "Please answer why you want to join";
+      if (!skills.trim()) return "Please describe your unique skills";
+      if (!goals.trim()) return "Please describe what you'd like to achieve";
+    }
+    if (currentStep === 5) {
+      if (agreement !== "agree") return "You must agree to the terms";
+    }
+    return null;
+  }
+
+  function handleStepClick(targetStep: number) {
+    if (targetStep < step) {
+      setError(null);
+      setStep(targetStep);
+      return;
+    }
+    for (let s = step; s < targetStep; s++) {
+      const err = validateStep(s);
+      if (err) {
+        setError(err);
+        return;
+      }
+    }
+    setError(null);
+    setStep(targetStep);
+  }
+
+  function handleNext() {
+    const err = validateStep(step);
+    if (err) {
+      setError(err);
+      return;
+    }
+    setError(null);
+    setStep((s) => Math.min(5, s + 1));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -187,7 +245,7 @@ function ApplicationForm({ userId }: { userId: string }) {
             <div key={s} className="flex items-center gap-1 flex-1">
               <button
                 type="button"
-                onClick={() => setStep(i + 1)}
+                onClick={() => handleStepClick(i + 1)}
                 className={`w-6 h-6 rounded-full text-[10px] font-bold flex items-center justify-center transition-all ${
                   step === i + 1
                     ? "bg-accent-500 text-white scale-110 shadow-lg shadow-accent-500/30"
@@ -421,8 +479,8 @@ function ApplicationForm({ userId }: { userId: string }) {
               <h3 className="font-semibold text-white text-lg mb-1">💫 Motivation</h3>
               <p className="text-dark-400 text-sm">Share your passion and vision</p>
             </div>
-            <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-300 text-xs flex items-start gap-2">
-              <span className="text-base">⚠️</span>
+            <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-300 text-xs flex items-center gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0" />
               <span>Please don&apos;t use AI for writing these answers! We want to hear your genuine thoughts.</span>
             </div>
 
@@ -522,7 +580,7 @@ function ApplicationForm({ userId }: { userId: string }) {
         {step < 5 ? (
           <button
             type="button"
-            onClick={() => setStep((s) => Math.min(5, s + 1))}
+            onClick={handleNext}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-500 text-white text-sm font-semibold transition-all"
           >
             Next
