@@ -196,23 +196,11 @@ export default async function SocietyPage({ params }: Props) {
                       </span>
                     )}
                   </div>
-                  <div className="flex flex-col gap-3 items-start lg:items-end">
-                    <JoinButton
-                      societyId={society.id}
-                      userId={user?.id}
-                      membership={membership}
-                    />
-
-                    {isCanvaCommunity && (
-                      <Link
-                        href="/societies/canva/apply"
-                        className="inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-accent-500 to-accent-600 text-white font-semibold rounded-xl hover:from-accent-600 hover:to-accent-700 transition-all btn-glow"
-                      >
-                        <ArrowRight className="h-4 w-4" />
-                        Apply for Executive Team
-                      </Link>
-                    )}
-                  </div>
+                  <JoinButton
+                    societyId={society.id}
+                    userId={user?.id}
+                    membership={membership}
+                  />
                 </div>
 
                 {society.description && (
