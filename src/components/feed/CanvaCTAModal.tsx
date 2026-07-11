@@ -179,7 +179,7 @@ function ApplicationForm({ userId }: { userId: string }) {
   const steps = ["Personal Info", "About You", "Roles", "Motivation", "Agreement"];
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col h-full">
+    <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
       {/* Step Progress */}
       <div className="px-6 pt-2 pb-5 border-b border-dark-700/50">
         <div className="flex items-center gap-1">
@@ -643,7 +643,7 @@ export function CanvaCTAModal({ isLoggedIn, userId, alreadyApplied }: CanvaCTAMo
           style={{ background: "rgba(3, 3, 3, 0.85)", backdropFilter: "blur(8px)" }}
           onClick={(e) => { if (e.target === e.currentTarget) setIsOpen(false); }}
         >
-          <div className="w-full sm:max-w-2xl h-[85vh] sm:h-[650px] flex flex-col bg-dark-950 sm:rounded-3xl border border-dark-700/80 shadow-2xl shadow-black/60 animate-in slide-in-from-bottom-8 sm:zoom-in-95 duration-300 overflow-hidden">
+          <div className="w-full sm:max-w-2xl max-h-[90vh] sm:max-h-[85vh] flex flex-col bg-dark-950 sm:rounded-3xl border border-dark-700/80 shadow-2xl shadow-black/60 animate-in slide-in-from-bottom-8 sm:zoom-in-95 duration-300 overflow-hidden">
 
             {/* Modal Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-dark-700/50 flex-shrink-0">
