@@ -82,8 +82,15 @@ src/
 
 1. Push your code to GitHub
 2. Import the repository in Vercel
-3. Add environment variables in Vercel project settings
-4. Deploy!
+3. Add environment variables in Vercel project settings:
+   - `NEXT_PUBLIC_SITE_URL=https://global-app-gamma.vercel.app`
+   - `NEXT_PUBLIC_SUPABASE_URL=...`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY=...`
+4. In Supabase Dashboard, add these to Auth > URL Configuration:
+   - Site URL: `https://global-app-gamma.vercel.app`
+   - Additional Redirect URLs: `https://global-app-gamma.vercel.app/auth/callback`
+   - Additional Redirect URLs: `https://global-app-gamma.vercel.app/reset-password`
+5. Deploy!
 
 ## License
 
