@@ -4,6 +4,7 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { getFeedItems, getUserSocieties, getLeaderboard } from "@/lib/actions/feed";
 import { Feed } from "@/components/feed/Feed";
+import { CanvaCTAModal } from "@/components/feed/CanvaCTAModal";
 import { 
   Sparkles, 
   Users, 
@@ -12,7 +13,6 @@ import {
   TrendingUp,
   Flame,
   Crown,
-  ArrowRight,
 } from "lucide-react";
 
 interface ProfileData {
@@ -57,6 +57,15 @@ export default async function FeedPage() {
 
   // Get leaderboard data
   const leaderboard = await getLeaderboard(profile?.university || null);
+
+  // Check if user already applied to Canva community
+  const { data: existingApplication } = await supabase
+    .from("canva_applications")
+    .select("id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  const alreadyApplied = !!existingApplication;
 
   return (
     <div className="min-h-screen bg-dark-950 pt-20">
@@ -208,32 +217,11 @@ export default async function FeedPage() {
 
           {/* Main Feed */}
           <div className="lg:col-span-3">
-            <div className="mb-8 glass rounded-3xl p-6 border border-accent-500/20 bg-gradient-to-r from-accent-500/10 via-dark-900 to-dark-900">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-5 h-5 text-accent-400" />
-                    <span className="text-sm font-medium text-accent-300 uppercase tracking-wide">
-                      Featured Opportunity
-                    </span>
-                  </div>
-                  <h2 className="text-2xl font-display font-bold text-white">
-                    Canva Student Community Executive Team Applications
-                  </h2>
-                  <p className="text-dark-200 mt-2 max-w-2xl">
-                    Join the founding team at Air University Islamabad and help build one of the campus&apos;s most creative communities.
-                  </p>
-                </div>
-
-                <Link
-                  href="/societies/canva/apply"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-accent-500 to-accent-600 text-white font-semibold rounded-xl hover:from-accent-600 hover:to-accent-700 transition-all btn-glow whitespace-nowrap"
-                >
-                  Apply Now
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-            </div>
+            <CanvaCTAModal
+              isLoggedIn={!!user}
+              userId={user.id}
+              alreadyApplied={alreadyApplied}
+            />
 
             {/* Feed Header */}
             <div className="flex items-center justify-between mb-8">
