@@ -15,7 +15,8 @@ export async function POST(request: Request) {
     }
 
     // Prevent duplicates
-    const { data: existing } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: existing } = await (supabase as any)
       .from("canva_applications")
       .select("id")
       .eq("user_id", user.id)
@@ -73,7 +74,8 @@ export async function POST(request: Request) {
       agreement: body.agreement,
     };
 
-    const { error } = await supabase.from("canva_applications").insert(insertPayload);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any).from("canva_applications").insert(insertPayload);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });

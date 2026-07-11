@@ -16,7 +16,8 @@ export default async function CanvaApplyPage() {
   }
 
   // Check if user already applied
-  const { data: existing } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: existing } = await (supabase as any)
     .from("canva_applications")
     .select("id")
     .eq("user_id", user.id)

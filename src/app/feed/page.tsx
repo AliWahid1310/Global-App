@@ -61,7 +61,8 @@ export default async function FeedPage() {
   // Check if user already applied to Canva community (safe fallback if table missing)
   let alreadyApplied = false;
   try {
-    const { data: existingApplication } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: existingApplication } = await (supabase as any)
       .from("canva_applications")
       .select("id")
       .eq("user_id", user.id)
