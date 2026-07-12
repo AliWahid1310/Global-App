@@ -17,12 +17,13 @@ export default async function CanvaApplyPage() {
   }
 
   // Get user's profile to check university
-  const { data: profile } = await supabase
+  const { data: profileData } = await supabase
     .from("profiles")
     .select("university")
     .eq("id", user.id)
     .single();
 
+  const profile = profileData as { university: string | null } | null;
   const university = profile?.university || "";
   const isAirUniversity = university.toLowerCase().includes("air university");
 

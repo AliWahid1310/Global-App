@@ -15,12 +15,13 @@ export async function POST(request: Request) {
     }
 
     // Check if user is from Air University
-    const { data: profile } = await supabase
+    const { data: profileData } = await supabase
       .from("profiles")
       .select("university")
       .eq("id", user.id)
       .single();
 
+    const profile = profileData as { university: string | null } | null;
     const university = profile?.university || "";
     if (!university.toLowerCase().includes("air university")) {
       return NextResponse.json({ error: "Only Air University students are eligible to apply." }, { status: 403 });
