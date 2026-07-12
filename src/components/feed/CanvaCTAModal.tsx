@@ -368,7 +368,7 @@ function ApplicationForm({ userId }: { userId: string }) {
               <p className="text-sm font-medium text-dark-200 mb-3">Have you ever volunteered in a university event? *</p>
               <div className="flex gap-3">
                 {["yes", "no"].map((v) => (
-                  <label key={v} className={`flex items-center gap-2 px-5 py-3 rounded-xl border cursor-pointer transition-all ${volunteered === v ? "border-accent-500 bg-accent-500/10 text-accent-300" : "border-dark-700 bg-dark-800/50 text-dark-300 hover:border-dark-500"}`}>
+                  <label key={v} className={`flex items-center gap-2 px-5 py-3 rounded-xl border cursor-pointer transition-all ${volunteered === v ? "border-accent-500 bg-accent-500/10 text-accent-300" : "border-dark-700 bg-dark-800/50 text-dark-100 hover:border-dark-500"}`}>
                     <input type="radio" name="volunteered" value={v} onChange={() => setVolunteered(v)} className="sr-only" />
                     <span className="capitalize font-medium text-sm">{v === "yes" ? "Yes" : "No"}</span>
                   </label>
@@ -380,7 +380,7 @@ function ApplicationForm({ userId }: { userId: string }) {
               <p className="text-sm font-medium text-dark-200 mb-3">Are you currently a member of any university society or organization? *</p>
               <div className="flex gap-3">
                 {["yes", "no"].map((v) => (
-                  <label key={v} className={`flex items-center gap-2 px-5 py-3 rounded-xl border cursor-pointer transition-all ${memberOfOrg === v ? "border-accent-500 bg-accent-500/10 text-accent-300" : "border-dark-700 bg-dark-800/50 text-dark-300 hover:border-dark-500"}`}>
+                  <label key={v} className={`flex items-center gap-2 px-5 py-3 rounded-xl border cursor-pointer transition-all ${memberOfOrg === v ? "border-accent-500 bg-accent-500/10 text-accent-300" : "border-dark-700 bg-dark-800/50 text-dark-100 hover:border-dark-500"}`}>
                     <input type="radio" name="memberOfOrg" value={v} onChange={() => setMemberOfOrg(v)} className="sr-only" />
                     <span className="capitalize font-medium text-sm">{v === "yes" ? "Yes" : "No"}</span>
                   </label>
@@ -427,7 +427,7 @@ function ApplicationForm({ userId }: { userId: string }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {ROLES.map((r) => (
-                <label key={r} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${roles.includes(r) ? "border-accent-500 bg-accent-500/10 text-accent-300" : "border-dark-700 bg-dark-800/30 text-dark-300 hover:border-dark-500"}`}>
+                <label key={r} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${roles.includes(r) ? "border-accent-500 bg-accent-500/10 text-accent-300" : "border-dark-700 bg-dark-800/30 text-dark-100 hover:border-dark-500"}`}>
                   <div className={`w-4 h-4 rounded flex-shrink-0 border-2 flex items-center justify-center transition-all ${roles.includes(r) ? "border-accent-500 bg-accent-500" : "border-dark-600"}`}>
                     {roles.includes(r) && <span className="text-[8px] text-white font-bold">✓</span>}
                   </div>
@@ -547,7 +547,7 @@ function ApplicationForm({ userId }: { userId: string }) {
 
             <div className="flex gap-3">
               {["agree", "disagree"].map((v) => (
-                <label key={v} className={`flex items-center gap-3 px-5 py-4 rounded-xl border cursor-pointer transition-all flex-1 ${agreement === v ? (v === "agree" ? "border-green-500 bg-green-500/10 text-green-300" : "border-red-500 bg-red-500/10 text-red-300") : "border-dark-700 bg-dark-800/50 text-dark-300 hover:border-dark-500"}`}>
+                <label key={v} className={`flex items-center gap-3 px-5 py-4 rounded-xl border cursor-pointer transition-all flex-1 ${agreement === v ? (v === "agree" ? "border-green-500 bg-green-500/10 text-green-300" : "border-red-500 bg-red-500/10 text-red-300") : "border-dark-700 bg-dark-800/50 text-dark-100 hover:border-dark-500"}`}>
                   <input type="radio" name="agreement" value={v} onChange={() => setAgreement(v)} className="sr-only" />
                   <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${agreement === v ? (v === "agree" ? "border-green-500 bg-green-500" : "border-red-500 bg-red-500") : "border-dark-600"}`}>
                     {agreement === v && <span className="w-1.5 h-1.5 rounded-full bg-white block" />}
@@ -566,7 +566,7 @@ function ApplicationForm({ userId }: { userId: string }) {
           type="button"
           onClick={() => setStep((s) => Math.max(1, s - 1))}
           disabled={step === 1}
-          className="px-5 py-2.5 rounded-xl border border-dark-700 text-dark-300 text-sm font-medium hover:border-dark-500 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+          className="px-5 py-2.5 rounded-xl border border-dark-700 text-dark-100 text-sm font-medium hover:border-dark-500 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
         >
           Back
         </button>
@@ -609,7 +609,7 @@ function AuthGate() {
         <Lock className="w-9 h-9 text-accent-400" />
       </div>
       <h3 className="text-2xl font-bold text-white mb-3">Sign in to Apply</h3>
-      <p className="text-dark-300 text-sm max-w-xs mb-8 leading-relaxed">
+      <p className="text-dark-100 text-sm max-w-xs mb-8 leading-relaxed">
         You need to create an account or log in to access the Canva Student Community application form.
       </p>
 
@@ -669,13 +669,13 @@ export function CanvaCTAModal({ isLoggedIn, userId, alreadyApplied }: CanvaCTAMo
               </span>{" "}
               Applications
             </h2>
-            <p className="text-dark-300 text-sm max-w-lg leading-relaxed">
+            <p className="text-dark-100 text-sm max-w-lg leading-relaxed">
               Join the founding team at Air University Islamabad and help build one of the campus&apos;s most creative communities. Shape the future of design culture on campus.
             </p>
 
             <div className="flex flex-wrap gap-2 mt-3">
               {["Events Team", "Graphic Design", "Social Media", "Content Writing"].map((tag) => (
-                <span key={tag} className="px-2.5 py-1 bg-dark-800/60 border border-dark-700 rounded-lg text-xs text-dark-300">
+                <span key={tag} className="px-2.5 py-1 bg-dark-800/60 border border-dark-700 rounded-lg text-xs text-dark-100">
                   {tag}
                 </span>
               ))}
@@ -730,7 +730,7 @@ export function CanvaCTAModal({ isLoggedIn, userId, alreadyApplied }: CanvaCTAMo
                     <CheckCircle2 className="w-10 h-10 text-green-400" />
                   </div>
                   <h3 className="text-xl font-bold text-white mb-3">Application Already Submitted</h3>
-                  <p className="text-dark-300 text-sm max-w-xs">
+                  <p className="text-dark-100 text-sm max-w-xs">
                     You&apos;ve already applied to the Canva Student Community. We&apos;ll get back to you soon!
                   </p>
                 </div>
