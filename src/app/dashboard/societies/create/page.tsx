@@ -12,6 +12,7 @@ import { getUserFriendlyError } from "@/lib/utils/errors";
 import { Loader2, ArrowLeft, Sparkles, Clock, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import type { SocietyStatus } from "@/types/database";
+import { useToast } from "@/components/ui/Toaster";
 
 export default function CreateSocietyPage() {
   const [name, setName] = useState("");
@@ -31,6 +32,7 @@ export default function CreateSocietyPage() {
   const [defaultStatus, setDefaultStatus] = useState<SocietyStatus>("pending");
   const router = useRouter();
   const supabase = createClient();
+  const { showToast } = useToast();
 
   // Check user permissions on mount
   useEffect(() => {
@@ -141,8 +143,10 @@ export default function CreateSocietyPage() {
 
       // Show success message for pending societies, redirect for approved
       if (permissions.defaultStatus === "pending") {
+        showToast("Your request has been sent to admin for approval!", "success");
         setSuccess(true);
       } else {
+        showToast("Society has been successfully created!", "success");
         router.push(`/societies/${slug}`);
         router.refresh();
       }
