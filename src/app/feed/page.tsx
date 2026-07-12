@@ -72,6 +72,8 @@ export default async function FeedPage() {
     alreadyApplied = false;
   }
 
+  const isAirUniversityUser = (profile?.university || "").toLowerCase().includes("air university");
+
   return (
     <div className="min-h-screen bg-dark-950 pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
@@ -222,11 +224,13 @@ export default async function FeedPage() {
 
           {/* Main Feed */}
           <div className="lg:col-span-3">
-            <CanvaCTAModal
-              isLoggedIn={!!user}
-              userId={user.id}
-              alreadyApplied={alreadyApplied}
-            />
+            {isAirUniversityUser && (
+              <CanvaCTAModal
+                isLoggedIn={!!user}
+                userId={user.id}
+                alreadyApplied={alreadyApplied}
+              />
+            )}
 
             {/* Feed Header */}
             <div className="flex items-center justify-between mb-8">

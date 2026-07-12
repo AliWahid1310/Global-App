@@ -14,6 +14,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
+    // Check if user is from Air University
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("university")
+      .eq("id", user.id)
+      .single();
+
+    const university = profile?.university || "";
+    if (!university.toLowerCase().includes("air university")) {
+      return NextResponse.json({ error: "Only Air University students are eligible to apply." }, { status: 403 });
+    }
+
     // Prevent duplicates
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: existing } = await (supabase as any)

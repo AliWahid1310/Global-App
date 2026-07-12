@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import CanvaApplicationForm from "@/components/society/CanvaApplicationForm";
 
@@ -13,6 +14,53 @@ export default async function CanvaApplyPage() {
 
   if (!user) {
     redirect(`/login?redirect=/societies/canva/apply`);
+  }
+
+  // Get user's profile to check university
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("university")
+    .eq("id", user.id)
+    .single();
+
+  const university = profile?.university || "";
+  const isAirUniversity = university.toLowerCase().includes("air university");
+
+  if (!isAirUniversity) {
+    return (
+      <div className="min-h-screen bg-dark-950 pt-24 pb-12">
+        <div className="max-w-xl mx-auto px-6">
+          <div className="glass rounded-3xl p-8 border border-red-500/25 bg-gradient-to-br from-red-950/20 via-dark-950 to-dark-900 text-center space-y-6">
+            <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto">
+              <span className="text-red-400 text-2xl">⚠️</span>
+            </div>
+            <h2 className="text-2xl font-display font-bold text-white">Eligibility Restricted</h2>
+            <p className="text-dark-200 text-sm leading-relaxed">
+              This application is exclusively open to students of <strong>Air University</strong>. 
+              {university ? (
+                <> Your profile indicates you are from <strong>{university}</strong>.</>
+              ) : (
+                <> You have not set your university in your profile yet.</>
+              )}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+              <Link
+                href="/profile"
+                className="px-6 py-3 bg-accent-600 hover:bg-accent-500 text-white font-semibold rounded-xl transition-all"
+              >
+                Update Profile
+              </Link>
+              <Link
+                href="/feed"
+                className="px-6 py-3 border border-dark-700 hover:border-dark-500 text-dark-200 hover:text-white font-semibold rounded-xl transition-all"
+              >
+                Back to Feed
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // Check if user already applied
