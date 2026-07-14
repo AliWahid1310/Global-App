@@ -686,29 +686,27 @@ export function CanvaCTAModal({ isLoggedIn, userId, alreadyApplied }: CanvaCTAMo
             </div>
           </div>
 
-          <button
-            id="canva-apply-btn"
-            onClick={() => { if (!hasSubmitted && !alreadyApplied) setIsOpen(true); }}
-            disabled={hasSubmitted || alreadyApplied}
-            className={`flex items-center justify-center gap-2 px-6 py-3.5 font-bold rounded-2xl transition-all shadow-xl whitespace-nowrap group ${
-              hasSubmitted || alreadyApplied
-                ? "bg-green-500/20 border border-green-500/30 text-green-400 cursor-not-allowed shadow-none"
-                : "bg-gradient-to-r from-accent-500 to-accent-600 text-white hover:from-accent-400 hover:to-accent-500 shadow-accent-500/30 hover:shadow-accent-500/50 hover:-translate-y-0.5"
-            }`}
-          >
-            {hasSubmitted || alreadyApplied ? (
-              <>
-                <CheckCircle2 className="w-4 h-4" />
-                Applied ✓
-              </>
-            ) : (
-              <>
-                <Palette className="w-4 h-4" />
-                Apply Now
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </>
-            )}
-          </button>
+          {hasSubmitted || alreadyApplied ? (
+            <div className="flex flex-col items-center gap-2 px-5 py-4 bg-green-500/10 border border-green-500/25 rounded-2xl text-center min-w-[180px] animate-in fade-in zoom-in-95 duration-300">
+              <div className="flex items-center gap-2 text-green-400 font-bold text-sm">
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                Application Submitted! 🎉
+              </div>
+              <p className="text-green-300/70 text-xs leading-relaxed">
+                We&apos;ll review your application and get back to you soon via email.
+              </p>
+            </div>
+          ) : (
+            <button
+              id="canva-apply-btn"
+              onClick={() => setIsOpen(true)}
+              className="flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-accent-500 to-accent-600 text-white font-bold rounded-2xl hover:from-accent-400 hover:to-accent-500 transition-all shadow-xl shadow-accent-500/30 hover:shadow-accent-500/50 hover:-translate-y-0.5 whitespace-nowrap group"
+            >
+              <Palette className="w-4 h-4" />
+              Apply Now
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </button>
+          )}
         </div>
       </div>
 
