@@ -56,7 +56,7 @@ const ROLES = [
 ];
 
 // ─── Application Form ────────────────────────────────────────────────────────
-function ApplicationForm({ userId }: { userId: string }) {
+function ApplicationForm({ userId, onSubmitSuccess }: { userId: string; onSubmitSuccess: () => void }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -101,6 +101,7 @@ function ApplicationForm({ userId }: { userId: string }) {
     if (!usedCanva) return "Please indicate your Canva experience";
     if (roles.length === 0) return "Please select at least one role";
     if (!experience.trim()) return "Please describe your experience";
+    if (!linkedin.trim()) return "LinkedIn Profile is required";
     if (!whyJoin.trim()) return "Please answer why you want to join";
     if (!skills.trim()) return "Please describe your unique skills";
     if (!goals.trim()) return "Please describe what you'd like to achieve";
@@ -126,6 +127,7 @@ function ApplicationForm({ userId }: { userId: string }) {
     if (currentStep === 3) {
       if (roles.length === 0) return "Please select at least one role";
       if (!experience.trim()) return "Please describe your experience";
+      if (!linkedin.trim()) return "LinkedIn Profile is required";
     }
     if (currentStep === 4) {
       if (!whyJoin.trim()) return "Please answer why you want to join";
@@ -211,6 +213,7 @@ function ApplicationForm({ userId }: { userId: string }) {
       }
 
       setSuccess(true);
+      onSubmitSuccess();
       setTimeout(() => router.refresh(), 800);
     } catch (err: any) {
       setError(err?.message || "Failed to submit application");
@@ -461,7 +464,7 @@ function ApplicationForm({ userId }: { userId: string }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-dark-200 mb-1.5">LinkedIn Profile (Optional)</label>
+              <label className="block text-sm font-medium text-dark-200 mb-1.5">LinkedIn Profile *</label>
               <input
                 value={linkedin}
                 onChange={(e) => setLinkedin(e.target.value)}
@@ -643,6 +646,7 @@ function AuthGate() {
 // ─── Main Modal Component ────────────────────────────────────────────────────
 export function CanvaCTAModal({ isLoggedIn, userId, alreadyApplied }: CanvaCTAModalProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   return (
     <>
@@ -684,12 +688,26 @@ export function CanvaCTAModal({ isLoggedIn, userId, alreadyApplied }: CanvaCTAMo
 
           <button
             id="canva-apply-btn"
-            onClick={() => setIsOpen(true)}
-            className="flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-accent-500 to-accent-600 text-white font-bold rounded-2xl hover:from-accent-400 hover:to-accent-500 transition-all shadow-xl shadow-accent-500/30 hover:shadow-accent-500/50 hover:-translate-y-0.5 whitespace-nowrap group"
+            onClick={() => { if (!hasSubmitted && !alreadyApplied) setIsOpen(true); }}
+            disabled={hasSubmitted || alreadyApplied}
+            className={`flex items-center justify-center gap-2 px-6 py-3.5 font-bold rounded-2xl transition-all shadow-xl whitespace-nowrap group ${
+              hasSubmitted || alreadyApplied
+                ? "bg-green-500/20 border border-green-500/30 text-green-400 cursor-not-allowed shadow-none"
+                : "bg-gradient-to-r from-accent-500 to-accent-600 text-white hover:from-accent-400 hover:to-accent-500 shadow-accent-500/30 hover:shadow-accent-500/50 hover:-translate-y-0.5"
+            }`}
           >
-            <Palette className="w-4 h-4" />
-            Apply Now
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            {hasSubmitted || alreadyApplied ? (
+              <>
+                <CheckCircle2 className="w-4 h-4" />
+                Applied ✓
+              </>
+            ) : (
+              <>
+                <Palette className="w-4 h-4" />
+                Apply Now
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -737,7 +755,7 @@ export function CanvaCTAModal({ isLoggedIn, userId, alreadyApplied }: CanvaCTAMo
               ) : !isLoggedIn ? (
                 <AuthGate />
               ) : (
-                <ApplicationForm userId={userId!} />
+                <ApplicationForm userId={userId!} onSubmitSuccess={() => { setHasSubmitted(true); setIsOpen(false); }} />
               )}
             </div>
           </div>
