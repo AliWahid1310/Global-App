@@ -249,13 +249,12 @@ function ApplicationForm({ userId, onSubmitSuccess }: { userId: string; onSubmit
               <button
                 type="button"
                 onClick={() => handleStepClick(i + 1)}
-                className={`w-6 h-6 rounded-full text-[10px] font-bold flex items-center justify-center transition-all ${
-                  step === i + 1
+                className={`w-6 h-6 rounded-full text-[10px] font-bold flex items-center justify-center transition-all ${step === i + 1
                     ? "bg-accent-500 text-white scale-110 shadow-lg shadow-accent-500/30"
                     : step > i + 1
-                    ? "bg-green-500/30 text-green-400"
-                    : "bg-dark-800 text-dark-500"
-                }`}
+                      ? "bg-green-500/30 text-green-400"
+                      : "bg-dark-800 text-dark-500"
+                  }`}
               >
                 {step > i + 1 ? "✓" : i + 1}
               </button>
@@ -575,7 +574,7 @@ function ApplicationForm({ userId, onSubmitSuccess }: { userId: string; onSubmit
         </button>
 
         <div className="flex items-center gap-1.5">
-          {[1,2,3,4,5].map((s) => (
+          {[1, 2, 3, 4, 5].map((s) => (
             <div key={s} className={`w-1.5 h-1.5 rounded-full transition-all ${s === step ? "bg-accent-500 w-4" : s < step ? "bg-green-500/60" : "bg-dark-700"}`} />
           ))}
         </div>
@@ -693,7 +692,7 @@ export function CanvaCTAModal({ isLoggedIn, userId, alreadyApplied }: CanvaCTAMo
                 Application Submitted! 🎉
               </div>
               <p className="text-green-300/70 text-xs leading-relaxed">
-                We&apos;ll review your application and get back to you soon via email.
+                We&apos;ll review your application and get back to you soon.
               </p>
             </div>
           ) : (
