@@ -698,12 +698,14 @@ export function CanvaCTAModal({ isLoggedIn, userId, alreadyApplied }: CanvaCTAMo
           ) : (
             <button
               id="canva-apply-btn"
-              onClick={() => setIsOpen(true)}
-              className="flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-accent-500 to-accent-600 text-white font-bold rounded-2xl hover:from-accent-400 hover:to-accent-500 transition-all shadow-xl shadow-accent-500/30 hover:shadow-accent-500/50 hover:-translate-y-0.5 whitespace-nowrap group"
+              type="button"
+              disabled
+              aria-disabled="true"
+              className="flex items-center justify-center gap-2 px-6 py-3.5 bg-dark-700 text-dark-300 font-bold rounded-2xl border border-dark-600 cursor-not-allowed opacity-70 whitespace-nowrap"
             >
               <Palette className="w-4 h-4" />
-              Apply Now
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              Applications Closed
+              <ArrowRight className="w-4 h-4" />
             </button>
           )}
         </div>
